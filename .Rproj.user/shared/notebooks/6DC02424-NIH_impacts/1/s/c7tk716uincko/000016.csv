@@ -1,0 +1,44 @@
+"0","term_tab %>%"
+"0","  select(""award_remaining"", ""award_remaining_noself"", ""FIPS"", ""state"", ""state_code"", ""org_name"") %>%"
+"0","  mutate(award_remaining = ifelse(award_remaining <0 , 0 , award_remaining),"
+"0","         award_remaining_noself = ifelse(award_remaining_noself <0 , 0 , award_remaining_noself)) %>%"
+"0","  rename(terminated_loss = award_remaining,"
+"0","         terminated_loss_noself = award_remaining_noself) %>%"
+"0","  mutate(terminated_econ_loss = terminated_loss * econ_multiplier,"
+"0","         terminated_job_loss = terminated_loss/job_value,"
+"0","         terminated_econ_loss_noself = terminated_loss_noself * econ_multiplier,"
+"0","         terminated_job_loss_noself = terminated_loss_noself/job_value) %>%"
+"0","  group_by(org_name, FIPS) %>%"
+"0","  summarize(across(starts_with(""terminated""), ~ sum(., na.rm=TRUE)))-> term_inst"
+"2","`summarise()` has grouped output by 'org_name'. You can override using the `.groups` argument."
+"0","NIH_clean_fips %>%"
+"0","  group_by(org_name, FIPS) %>%"
+"0","  summarize(across(starts_with(""IDC""), ~ sum(., na.rm=TRUE)))-> IDC_inst"
+"2","`summarise()` has grouped output by 'org_name'. You can override using the `.groups` argument."
+"0","#combine commuter data with NIH data"
+"0","county_commute_NIH_inst <- merge(commute, term_inst, by.x = ""DESTINATION"", by.y = ""FIPS"", all.x = TRUE) %>%"
+"0","                  merge(IDC_inst, by.x = c(""DESTINATION"", ""org_name""), by.y = c(""FIPS"", ""org_name""), all.x = TRUE)"
+"0",""
+"0","#replace all NA values with zeros"
+"0","county_commute_NIH_inst <- mutate_all(county_commute_NIH_inst , funs(replace(., is.na(.), 0))) %>%"
+"0","  mutate(across(starts_with(c(""terminated"", ""IDC"", ""grant"", ""overlap"")), ~ . * proportion)) %>%"
+"0","  rename(FIPS = ORIGIN) %>%"
+"0","  group_by(FIPS) %>%"
+"0","  group_by(FIPS, org_name) %>% "
+"0","  summarize(across(starts_with(c(""terminated"", ""IDC"", ""grant"", ""overlap"")), ~ sum(., na.rm=TRUE))) %>%"
+"0","  slice_max(IDC_econ_loss, n=5)"
+"2","Warning: `funs()` was deprecated in dplyr 0.8.0.
+Please use a list of either functions or lambdas: 
+
+  # Simple named list: 
+  list(mean = mean, median = median)
+
+  # Auto named with `tibble::lst()`: 
+  tibble::lst(mean, median)
+
+  # Using lambdas
+  list(~ mean(., trim = .2), ~ median(., na.rm = TRUE))"
+"2","`summarise()` has grouped output by 'FIPS'. You can override using the `.groups` argument."
+"0","#write.csv(county_commute_NIH_inst, ""output/methods/county_commute_NIH_inst.csv"", row.names=FALSE)"
+"0",""
+"0","  "
