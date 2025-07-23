@@ -1,0 +1,376 @@
+"org_name","lat","lon","terminated_loss","terminated_num","terminated_loss_noself","terminated_num_noself"
+"University of Texas Medical Branch Galveston",29.311028,-94.778007,44997610.67,6,44997610.67,6
+"University of Texas MD Anderson Cancer Center",29.706319,-95.397195,1183392.42,3,1183392.42,3
+"Florida A&M University",30.428914,-84.289766,6912299.41,1,6912299.41,1
+"University of Texas Southwestern Medical Center",32.811963,-96.837534,9077586.57372057,13,9077586.57372057,12
+"Clark Atlanta University",33.747725,-84.41301,397805.39,2,397805.39,1
+"Charles R. Drew University of Medicine & Science",33.923952,-118.245687,35864801.33,3,35864801.33,2
+"Wake Forest University Health Sciences",36.059402,-80.321981,5365591,9,5365591,9
+"Virginia Polytechnic Institute and State University",37.233061,-80.421005,7906404.37,10,7906404.37,10
+"WETA TV 26",38.84087,-77.086486,65168.7,1,65168.7,1
+"Indiana University",39.172055,-86.523157,36884.33,1,36884.33,1
+"Rutgers, Camden",39.947479,-75.123053,82742.2,1,82742.2,1
+"The Research Institute at Nationwide Children's Hospital",39.95251,-82.979302,1173879.99,3,1173879.99,3
+"Rutgers, Newark",40.740542,-74.172677,149742.31,1,149742.31,1
+"NDRI-USA, Inc.",40.74287,-73.992333,257235.38,1,257235.38,1
+"Weill Medical College of Cornell University",40.7607,-73.9603,22692110.49,11,22692110.49,11
+"The Research Foundation for Mental Hygiene, Inc.",40.843076,-73.944206,3454344.98,7,3454344.98,7
+"Fordham University",40.86209,-73.88639,1509299,2,1509299,2
+"Pennsylvania State University",40.870717,-77.83415,2887553.99,7,2887553.99,5
+"Butler Hospital",41.843586,-71.379656,103572.21,1,103572.21,1
+"University of Massachusetts Medical School Worcester",42.2802,-71.758245,3939059.52,9,3017450.1,7
+"Rosalind Franklin University of Medicine & Science",42.302294,-87.861378,476022.61,1,476022.61,1
+"Function Promoting Therapies, LLC",42.33724,-71.10217,2262195.07,1,2262195.07,1
+"Henry Ford Health and Michigan State University Health Sciences",42.653979,-84.492032,1519244.64,4,1519244.64,4
+"Van Andel Research Institute",42.969389,-85.666402,105648.66,1,105648.66,1
+"University of Vermont and State Agricultural College",44.478282,-73.201079,184979.46,1,184979.46,1
+"Boston University",42.33639,-71.07097,4490249.03,11,4490249.03,10
+"Tufts University",42.3498,-71.06149,7417446.68,7,7417446.68,7
+"Columbia University",40.8415,-73.9414,397029240.46,183,368146210.61,162
+"University of Miami",25.713468,-80.277246,7036851.74417582,22,7036851.74417582,21
+"University of Hawaii at Manoa",21.299198,-157.820371,11102196.2,10,11102196.2,9
+"Florida International University",25.761055,-80.376195,15449611.11,6,15449611.11,6
+"Nova Southeastern University",26.07761,-80.242565,47184.02,1,47184.02,1
+"University of Central Florida",28.601027,-81.197266,3287121.08,5,3287121.08,5
+"St. Mary's University",29.451933,-98.560605,57055.58,1,57055.58,1
+"University of Texas San Antonio",29.567119,-98.605723,2643423.43,8,2643423.43,8
+"University of Florida",29.643443,-82.349637,5028092.16,17,5028092.16,13
+"Baylor College of Medicine",29.70926,-95.400851,8159830.83657143,18,8134455.42657143,14
+"University of Houston",29.718091,-95.336483,919520.91,4,919520.91,4
+"Texas State University",29.888774,-97.937445,702480.41,2,476085.43,1
+"Tulane University of Louisiana",29.935429,-90.12279,4135407.44,5,4135407.44,5
+"University of Texas at Austin",30.291188,-97.737568,3741169.26,5,3741169.26,5
+"Louisiana State University A&M College Baton Rouge",30.408018,-91.188669,387418.848791209,5,387418.848791209,5
+"Florida State University",30.441455,-84.297889,9858922.69,7,9858922.69,7
+"University of Texas El Paso",31.770518,-106.504149,3836820.53,4,3836820.53,4
+"University of Arizona",32.232844,-110.959467,7711422.39950495,17,7022504.97950495,15
+"University of Mississippi Medical Center",32.328724,-90.175537,1188995.38,4,1188995.38,4
+"Auburn University at Auburn",32.602139,-85.508496,1041283.02,2,1041283.02,2
+"University of North Texas Health Science Center",32.749542,-97.36903,10373954,3,10373954,3
+"San Diego State University",32.762178,-117.069156,15544377.41,13,15544377.41,13
+"Medical University of South Carolina",32.786754,-79.947265,2214918.34571429,9,2214918.34571429,8
+"University of California, San Diego",32.876991,-117.24087,28542438.97,28,28542438.97,25
+"Scripps Research Institute, the",32.903062,-117.243592,3580256.46,1,3580256.46,1
+"Arizona State University-Tempe Campus",33.423954,-111.940687,1115149.46,5,1115149.46,4
+"Center for Innovative Public Health Research",33.430039,-117.616549,2600670,3,2600670,3
+"Banner Health",33.433422,-112.087594,3886206.27,1,3886206.27,1
+"University of Alabama at Birmingham",33.50591,-86.799772,18410765.27,20,18410765.27,20
+"Texas Tech University",33.584696,-101.872767,195715.16,1,195715.16,1
+"University of California-Irvine",33.64852,-117.82136,6485989.85164874,23,6485989.85164874,21
+"Spelman College",33.745247,-84.411462,5488977.23,2,5488977.23,2
+"Morehouse School of Medicine",33.746607,-84.414781,4465257.25,3,4465257.25,3
+"Georgia State University",33.753531,-84.384483,983059.85,5,983059.85,5
+"Emory University",33.791247,-84.3249,31531266.1,32,31531266.1,30
+"California State University Fullerton",33.8781,-117.884245,804237.98,3,804237.98,3
+"University of Georgia",33.931173,-83.378873,3733351.35,5,3733351.35,5
+"Loyola Marymount University",33.969677,-118.416139,509238.63,1,509238.63,1
+"University of South Carolina at Columbia",33.999623,-81.028249,7677384.32,10,7677384.32,9
+"Rand Corporation",34.009659,-118.490943,4929775.34,4,4929775.34,4
+"University of Southern California",34.017282,-118.281254,4450615.10153846,19,4450615.10153846,17
+"Public Health Foundation Enterprises",34.029482,-118.023269,2195064.13,4,2195064.13,4
+"Kennesaw State University",34.034315,-84.574275,696259.68,2,696259.68,2
+"University of California Los Angeles",34.070199,-118.45102,13302242.2558937,24,13302242.2558937,21
+"Children's Hospital of Los Angeles",34.098065,-118.29069,12745376.5772527,2,12745376.5772527,2
+"California State University Northridge",34.245875,-118.501885,637368.91,1,637368.91,1
+"University of Mississippi",34.36739,-89.528956,666950.02,4,666950.02,4
+"University of California Santa Barbara",34.431306,-119.834277,803246.81,4,803246.81,4
+"University of North Carolina at Pembroke",34.694134,-79.198114,46186.43,1,46186.43,1
+"University of Arkansas for Medical Sciences",34.749005,-92.320097,2305796.79373444,6,2305796.79373444,6
+"University of Tennessee Chattanooga",35.045822,-85.299815,224753.34,1,224753.34,1
+"University of New Mexico",35.090226,-106.625292,12172793.7,3,12172793.7,3
+"University of New Mexico Health Sciences Center",35.090968,-106.617544,11138442.85,4,158168.25,3
+"University of Memphis",35.120123,-89.939705,9625.8,1,9625.8,1
+"University of North Carolina Charlotte",35.301652,-80.731452,1263352.66,3,1263352.66,3
+"University of Oklahoma Health Sciences Center",35.47459,-97.505034,1630533.55120879,8,1630533.55120879,8
+"Cherokee Nation",35.85318,-94.99067,1192939.12,2,1192939.12,2
+"Research Triangle Institute",35.9138,-78.848911,1137355.66263736,4,1137355.66263736,3
+"University of North Carolina Chapel Hill",35.9316,-79.057377,22899775.7303297,28,18127524.7503297,26
+"University of Tennessee Knoxville",35.954943,-83.93035,14549.29,2,14549.29,1
+"Innovation Research and Training, Inc.",35.964557,-78.940527,114998.7,1,114998.7,1
+"Family Health International",35.992834,-78.903914,425648342.9,1,425648342.9,1
+"Duke University",36.007766,-78.926475,8911947.49769231,25,8590460.50769231,19
+"University of Nevada Las Vegas",36.109517,-115.141947,5625514.06,4,5625514.06,4
+"Oklahoma State University Stillwater",36.115627,-97.058038,315497.89,1,315497.89,1
+"Vanderbilt University",36.143381,-86.803365,10714991.0260581,20,10714991.0260581,18
+"Meharry Medical College",36.166904,-86.806149,25842337.5,4,25842337.5,4
+"University of California Santa Cruz",36.97756,-122.055836,7590951,7,7590951,7
+"San Jose State University",37.340938,-121.889413,11759.48,1,11759.48,1
+"Stanford University",37.426852,-122.17047,9627989.38808824,18,9627989.38808824,18
+"Virginia Commonwealth University",37.549807,-77.452775,7467182.27,11,7467182.27,9
+"San Francisco State University",37.72091,-122.476074,1424087.81,3,1424087.81,3
+"University of California, San Francisco",37.767442,-122.413937,31081121.7244444,46,30179201.6944444,42
+"University of San Francisco",37.775292,-122.451727,555384.5,2,555384.5,1
+"Kaiser Foundation Research Institute",37.805769,-122.265214,533859.37,1,0,0
+"University of California Berkeley",37.870017,-122.268624,5357889.9,16,5357889.9,16
+"University of the Pacific-Stockton",37.984345,-121.309964,425200.62,1,425200.62,1
+"University of Kentucky",38.040959,-84.505885,3140915.33,6,3140915.33,5
+"University of Virginia",38.050527,-78.500531,23865153.62,10,23865153.62,10
+"University of Louisville",38.215024,-85.760145,2987147.37,7,2987147.37,7
+"Neurovations",38.325376,-122.291992,4347102.21,1,4347102.21,1
+"University of California at Davis",38.543366,-121.72946,8523053.11,22,8523053.11,20
+"Washington University",38.664368,-90.323797,15835124.39,27,14749203.73,25
+"George Washington University",38.898075,-77.043933,3681326.36,6,3681326.36,6
+"Gerontological Society of America",38.903389,-77.029146,1043970.63,2,1043970.63,1
+"Whitman-Walker Institute, Inc.",38.9127,-77.031423,1532010.33,2,1532010.33,2
+"Children's Research Institute",38.927274,-77.014396,1461561.37,3,1461561.37,3
+"Us Helping Us, People Into Living, Inc.",38.935098,-77.024402,114194,1,114194,1
+"University of Maryland, College Park",38.992333,-76.952986,3545529.52,8,3545529.52,8
+"University of Missouri Kansas City",39.034521,-94.575773,815550.82,1,815550.82,1
+"Pacific Institute for Research and Evaluation",39.050676,-76.93727,1208607.36,2,1208607.36,2
+"Westat, Inc.",39.094626,-77.181453,10317272.5,1,10317272.5,1
+"University of Cincinnati",39.129719,-84.520554,3701011.32,5,3701011.32,5
+"University of Maryland Baltimore",39.292248,-76.625629,15180808.55,14,15180808.55,14
+"Friends Research Institute, Inc.",39.303676,-76.619888,1419942.37,2,1419942.37,2
+"Johns Hopkins University",39.325256,-76.605131,17575294.53,29,17575294.53,29
+"University of Nevada Reno",39.545077,-119.818277,357305.038461538,4,357305.038461538,4
+"University of Denver (Colorado Seminary)",39.676639,-104.959481,995920.28,1,995920.28,1
+"Denver Health and Hospital Authority",39.727302,-104.991569,138989.95,1,138989.95,1
+"University of Colorado Denver",39.745098,-104.837605,9074096.70087912,27,9074096.70087912,26
+"Children's Hospital of Philadelphia",39.946632,-75.196604,2062405.82285714,7,2062405.82285714,7
+"University of Pennsylvania",39.953462,-75.193983,14485771.105385,27,14485771.105385,26
+"Drexel University",39.954073,-75.186541,7998787.04,8,7998787.04,8
+"Temple University of the Commonwealth",39.980272,-75.157051,2069902.83934066,7,2069902.83934066,7
+"Ohio State University",39.999598,-83.033131,10579378.29,17,10579378.29,17
+"University of Illinois at Urbana-Champaign",40.116857,-88.228755,54655.6,1,54655.6,1
+"Pennsylvania State University Hershey Medical Center",40.264414,-76.674014,4748504.14,3,4748504.14,3
+"Princeton University",40.345441,-74.655866,188828.56,5,160543.66,3
+"Purdue University",40.41872,-86.910361,303659.72,4,303659.72,3
+"Duquesne University",40.437818,-79.993649,92040.95,1,92040.95,1
+"University of Pittsburgh at Pittsburgh",40.440909,-79.959125,11430326.1,31,11246471.56,28
+"Rutgers Biomedical and Health Sciences",40.520984,-74.473247,4749598.37,11,4749598.37,11
+"Brooklyn College",40.631637,-73.952868,10922.68,1,10922.68,1
+"New York University School of Medicine",40.669895,-73.974354,4360702.86,10,4360702.86,9
+"New York University",40.729659,-73.997018,2684695.69,7,2684695.69,7
+"New School University",40.735382,-73.997241,41180.64,1,41180.64,1
+"Queens College",40.735855,-73.815751,11579.96,1,11579.96,1
+"Ecohealth Alliance, Inc.",40.754061,-73.998951,5716314.4,4,0,0
+"Sloan-Kettering Inst Can Research",40.764045,-73.956024,116261,2,116261,1
+"University of Utah",40.764542,-111.850317,1864481.99,12,1864481.99,10
+"New York Blood Center",40.76519,-73.959922,432943.36,2,432943.36,2
+"Hunter College",40.768737,-73.965182,740708.63,5,740708.63,5
+"Icahn School of Medicine at Mount Sinai",40.790284,-73.946781,17409890.22,16,17409890.22,13
+"City College of New York",40.819407,-73.950169,315433.07,2,315433.07,2
+"University of Nebraska Lincoln",40.823017,-96.673442,790935.84,4,790935.84,4
+"Albert Einstein College of Medicine",40.85103,-73.844379,1905414.18,11,1905414.18,11
+"Hackensack University Medical Center",40.883415,-74.055652,84046.33,1,84046.33,1
+"State University New York Stony Brook",40.914561,-73.125169,3362610.51,5,3362610.51,4
+"Silverbills Inc.",40.946852,-73.772045,114680.93,1,114680.93,1
+"Yale University",41.310925,-72.926428,15564073.14,35,15523984.02,32
+"Pro-Change Behavior Systems, Inc.",41.451027,-71.497523,87678.57,1,87678.57,1
+"University of Rhode Island",41.486042,-71.528656,901462.27,2,901462.27,2
+"Case Western Reserve University",41.502739,-81.607334,4083029.68,9,4083029.68,8
+"University of Iowa",41.664405,-91.542152,757650.305315315,7,757650.305315315,5
+"National Opinion Research Center",41.785875,-87.597545,215547.58,2,215547.58,2
+"University of Chicago",41.789554,-87.601172,13020788.6113537,13,13020788.6113537,13
+"Emma Pendleton Bradley Hospital",41.792379,-71.367401,335420.93,2,335420.93,2
+"Resilient Games Studio, LLC",41.798959,-87.598077,84777.53,1,84777.53,1
+"University of Connecticut Storrs",41.811419,-72.247553,1404919.47285714,6,1404919.47285714,6
+"Rhode Island Hospital",41.811681,-71.409371,517909.65,4,517909.65,2
+"Brown University",41.826136,-71.404513,7010874.134615,16,6996762.134615,13
+"Illinois Institute of Technology",41.831064,-87.629049,196611.92,1,196611.92,1
+"University of Illinois at Chicago",41.871509,-87.667721,4331331.14,7,4331331.14,7
+"Rush University Medical Center",41.87506,-87.668327,1934012.27,3,1934012.27,3
+"Lurie Children's Hospital of Chicago",41.896663,-87.622919,179368,1,179368,1
+"Endeavor Health Clinical Operations",42.064695,-87.689868,1380567.55,1,1380567.55,1
+"Eastern Michigan University",42.233132,-83.623767,952548.23,1,952548.23,1
+"University of Michigan at Ann Arbor",42.275494,-83.743038,23799134.9117582,33,23799134.9117582,29
+"Harvard Pilgrim Health Care, Inc.",42.316808,-71.234595,3830024.58,5,3830024.58,5
+"Harvard School of Public Health",42.335306,-71.102775,590107826.41,157,578881434.18,152
+"Boston Medical Center",42.336854,-71.070881,171615.54,2,171615.54,2
+"Boston College",42.336956,-71.170504,3376275.21,5,3376275.21,4
+"Boston Children's Hospital",42.337481,-71.104964,3626133.564467,10,3626133.564467,10
+"Beth Israel Deaconess Medical Center",42.33982,-71.10568,474125.39,3,474125.39,3
+"Northeastern University",42.340048,-71.088892,1135546.91,4,1135546.91,4
+"Fenway Community Health Center",42.34412,-71.098412,411683.52,1,411683.52,1
+"Broad Institute, Inc.",42.363082,-71.087893,7920606.23,2,7920606.23,2
+"Harvard University",42.369697,-71.11193,171947205.87,139,171013178.63,134
+"Ibis Reproductive Health",42.372813,-71.119098,214131,1,214131,1
+"Cambridge Health Alliance",42.374417,-71.104436,1712200.84,2,1712200.84,2
+"University of Massachusetts Amherst",42.386914,-72.521131,1137695.81,1,1137695.81,1
+"Cornell University",42.438,-76.4625,9261302.2,4,9261302.2,4
+"Michigan State University",42.653979,-84.492032,966794.68,5,966794.68,4
+"Roswell Park Cancer Institute Corp",42.873378,-78.869243,2093741.69,1,2093741.69,1
+"State University of New York at Buffalo",43.003074,-78.785924,2319192.73,8,2319192.73,8
+"Marquette University",43.038728,-87.923307,127391.05,1,127391.05,1
+"Medical College of Wisconsin",43.04575,-88.020374,2223530.89,9,2223530.89,9
+"University of Wisconsin-Madison",43.068519,-89.400858,4317113.29,15,4290599.47,13
+"University of Wisconsin Milwaukee",43.075704,-87.877999,2840768.22,5,2472221.18,4
+"University of Rochester",43.131774,-77.63546,7517536.6845768,15,7517536.6845768,13
+"Mainehealth",43.653164,-70.275471,5014585.42,1,5014585.42,1
+"University of Oregon",44.045509,-123.069741,1597374.96,8,1597374.96,7
+"Iris Media, Inc.",44.048722,-123.088476,102337.86,1,102337.86,1
+"Healthpartners Institute",44.85364,-93.225576,1463450.41,2,1463450.41,2
+"University of Minnesota",44.975143,-93.227003,14250755.54,15,10869196.02,13
+"Oregon Health & Science University",45.49882,-122.685647,2833191.88,6,2833191.88,6
+"Montana State University - Bozeman",45.661963,-111.059937,435210,2,435210,2
+"Washington State University",46.728892,-117.155742,5592975.11,5,5592975.11,5
+"University of Idaho",46.730287,-116.996847,243447.5,1,243447.5,1
+"University of Montana",46.860203,-113.983723,178892.17,2,178892.17,2
+"Institute for Systems Biology",47.622538,-122.337533,643150,2,643150,2
+"Fred Hutchinson Cancer Center",47.626482,-122.329606,1888125.51153846,6,1888125.51153846,6
+"University of Washington",47.660307,-122.315168,10949621.74,24,10800285.49,20
+"Seattle Children's Hospital",47.66243,-122.282291,1129237.27,4,1129237.27,4
+"Southcentral Foundation",61.182148,-149.795959,698945.86,1,698945.86,1
+"University of Alaska Anchorage",61.190646,-149.818129,33538.85,1,33538.85,1
+"Queen's Medical Center",21.307803,-157.853947,633837.19,1,633837.19,1
+"Colliga Apps Corp.",25.763047,-80.190448,178325,1,178325,1
+"University of South Florida",28.074039,-82.395963,186815.06,2,186815.06,1
+"University of Texas Health Science Center",29.513091,-98.577742,4513650.92153846,8,4513650.92153846,8
+"University of Texas Health Science Center Houston",29.703025,-95.403303,1105951.57,5,1105951.57,5
+"LSU Health Scienes Center",29.957378,-90.082793,420165.13,2,420165.13,2
+"Dillard University",29.996211,-90.065957,267305.26,1,267305.26,1
+"Prairie View A&M University ",30.081335,-95.992865,29392.01,1,29392.01,1
+"Mayo Clinic Jacksonville",30.264703,-81.444793,6564.86,1,6564.86,1
+"University of North Florida",30.270668,-81.510431,124502.12,1,124502.12,1
+"Texas Engineering Experiment Station",30.561542,-96.253207,646122,1,646122,1
+"Texas A&M University",30.605876,-96.368771,1733326.53,8,1733326.53,7
+"Sam Houston State University",30.715211,-95.549345,60143.62,1,60143.62,1
+"Baylor University",31.555713,-97.121401,2180559,1,2180559,1
+"New Mexico State University Las Cruces",32.279041,-106.755696,530793.08,2,530793.08,2
+"University of Texas Arlington",32.728201,-97.112604,1260984.22,2,1260984.22,2
+"Scripps Health",32.887742,-117.223797,202964,1,202964,1
+"California State University San Marcos",33.13799,-117.151093,49660.96,2,49660.96,1
+"Claflin University",33.495919,-80.855463,699563.4,1,699563.4,1
+"Mayo Clinic Arizona",33.589113,-111.79394,847196.28,2,847196.28,2
+"California State University Long Beach",33.781104,-118.109903,122592.96,1,122592.96,1
+"Georgia Institute of Technology",33.781897,-84.404009,312655.39,4,312655.39,3
+"California State University - Dominguez Hills",33.867141,-118.255341,32192.43,1,32192.43,1
+"California State University Los Angeles",34.062539,-118.169044,50954.52,1,50954.52,1
+"California Institute of Technology",34.134332,-118.12652,709275.17,2,709275.17,2
+"California State University San Bernardino",34.176782,-117.330185,715994.85,1,715994.85,1
+"Clemson University",34.673146,-82.823962,269784.54,3,269784.54,2
+"Fayetteville State University",35.071547,-78.894454,94529.28,1,94529.28,1
+"St. Jude Children's Research Hospital",35.155607,-90.045279,548981,2,548981,2
+"University of Oklahoma",35.209223,-97.443781,1150230,1,1150230,1
+"California State University Bakersfield",35.354257,-119.107587,162867.81,1,162867.81,1
+"Oklahoma Medical Research Foundation",35.482988,-97.49781,487581.58,2,487581.58,2
+"Equiti Foods, LLC",35.901309,-79.061049,55120,1,55120,1
+"North Carolina Central University",35.97467,-78.898054,224681.54,1,224681.54,1
+"University of North Carolina Greensboro",36.065048,-79.808967,106074.32,1,106074.32,1
+"Laureate Institute for Brain Research",36.066243,-95.919455,1476817.13,2,1476817.13,2
+"North Carolina A&T State University",36.074178,-79.775965,107518.95,2,107518.95,2
+"Tennessee State University",36.168333,-86.828524,153224.53,1,153224.53,1
+"Old Dominion University",36.888989,-76.303478,108577.06,2,108577.06,2
+"Western Kentucky University",36.986798,-86.455375,274169,1,274169,1
+"Hampton University",37.025661,-76.347732,106212,1,106212,1
+"Fort Lewis College",37.274983,-107.872039,307317.49,1,307317.49,1
+"University of California, Merced",37.351306,-120.4324,541955.21,2,541955.21,1
+"San Francisco Department of Public Health",37.778128,-122.418652,924356,1,0,0
+"California State University Sacramento",38.553853,-121.421265,47711.91,1,47711.91,1
+"Isa Associates, Inc.",38.805407,-77.039842,1250418.19,1,1250418.19,1
+"American Psychological Association",38.89984,-77.007538,301053.6,1,301053.6,1
+"Endocrine Society",38.904115,-77.046163,1361923,1,1361923,1
+"Georgetown University",38.905206,-77.07547,750618.39,2,750618.39,2
+"Howard University",38.923138,-77.021576,2345639.96,2,2345639.96,2
+"Academic Pediatric Association",38.937467,-77.176943,858505.96,1,858505.96,1
+"University of Missouri-Columbia",38.948231,-92.327335,6302580.97,7,6302580.97,7
+"American Gastroenterological Association Institute",38.989333,-77.099203,810801,1,810801,1
+"Delaware State University",39.189379,-75.541169,7573755.23,3,7573755.23,3
+"University of Maryland Baltimore County",39.252457,-76.71121,1840427.02,4,1840427.02,4
+"Rowan University",39.707715,-75.116897,333302.61,1,333302.61,1
+"University of Delaware",39.714507,-75.738715,224873.354725275,3,224873.354725275,2
+"Indiana University Indianapolis",39.779213,-86.175288,4999939.24,10,4999939.24,10
+"Thomas Jefferson University",39.948207,-75.157825,856620.23,2,856620.23,2
+"Rutgers University",40.481906,-74.457066,444621,3,444621,2
+"Colorado State University",40.57951,-105.081267,740945.99,4,740945.99,4
+"Medgar Evers College",40.667136,-73.951831,60291.25,1,60291.25,1
+"New Jersey Institute of Technology",40.742916,-74.176244,833817.33,2,833817.33,2
+"Bellage, Inc.",40.74767,-73.918101,6300,1,6300,1
+"Hospital for Special Surgery",40.765324,-73.953947,676204,1,676204,1
+"Cold Spring Harbor Laboratory",40.86755,-73.473456,274670.22,1,274670.22,1
+"Herbert H. Lehman College",40.870857,-73.8866,187999.42,2,187999.42,2
+"Kent State University",41.152425,-81.337881,419715,1,419715,1
+"University of Nebraska Medical Center",41.265996,-96.010026,1378237.56,4,1378237.56,4
+"University of Notre Dame",41.693901,-86.239284,721843.22,3,721843.22,3
+"University of Connecticut School of Medicine",41.734182,-72.793791,348584.91,2,348584.91,2
+"Northwestern University",42.050479,-87.680046,39634870.0291209,26,39506572.0491209,25
+"Worcester Polytechnic Institute",42.274036,-71.806691,122381.54,2,122381.54,1
+"University of Massachusetts Boston",42.313703,-71.062976,1480287,1,1480287,1
+"Harvard Medical School",42.335672,-71.104237,444205072.09,340,444195664.09,335
+"Wayne State University",42.357466,-83.065294,1182833.32,6,1182833.32,5
+"McLean Hospital",42.393619,-71.191142,1846163,3,1846163,3
+"Rensselaer Polytechnic Institute",42.732865,-73.683493,993814,1,993814,1
+"Syracuse University",43.041575,-76.133784,13429.98,1,13429.98,1
+"Rochester Institute of Technology",43.092171,-77.674767,76536.09,1,76536.09,1
+"Central Michigan University",43.601402,-84.787107,308460,1,308460,1
+"Dartmouth College",43.711386,-72.270611,500396.83,3,500396.83,3
+"Jackson Laboratory",44.365361,-68.196303,873686.63,3,873686.63,3
+"Clarkson University",44.65482,-74.95554,69073.23,1,69073.23,1
+"Missouri Breaks Research, Inc.",45.4277,-101.074481,1019047,1,1019047,1
+"Portland State University",45.51201,-122.679476,515262.22,1,515262.22,1
+"Allen Institute",47.650084,-122.351604,61010.3884788868,3,61010.3884788868,3
+"University of North Dakota",47.919868,-97.072819,171420.25,2,171420.25,2
+"University of Alaska Fairbanks",64.857437,-147.800301,296755.61,1,296755.61,1
+"University of Colorado - Colorado Springs",38.891282,-104.800059,2522884.59,6,2522884.59,5
+"University of Kansas Medical Center",39.026584,-94.636347,374022,1,374022,1
+"Moffitt Cancer Center",28.062583,-82.419596,29434.22,1,29434.22,1
+"Rice University",29.717236,-95.402761,345087.68,2,345087.68,2
+"Xavier University of Louisiana",29.964291,-90.107468,420461.63,1,420461.63,1
+"LSU Pennington Biomedical Research Center",30.403353,-91.122687,74485.48,2,74485.48,1
+"Texas Tech University Health Sciences Center El Paso",31.769999,-106.431625,382069.11,1,382069.11,1
+"Alabama State University",32.365014,-86.295702,337440.87,1,337440.87,1
+"University of North Texas",33.21077,-97.147769,302172.03,1,302172.03,1
+"Augusta University",33.470962,-81.991405,3658559.86,3,3658559.86,3
+"University of California Riverside",33.972585,-117.350361,778367.53,2,778367.53,2
+"North Carolina State University Raleigh",35.784675,-78.677233,484783,1,484783,1
+"University of Arkansas at Fayetteville",36.069922,-94.176965,299575.86,1,299575.86,1
+"East Tennessee State University",36.330892,-82.365584,568254.09,1,568254.09,1
+"Gladstone Institutes",37.767618,-122.394315,49189.08,1,49189.08,1
+"Smith-Kettlewell Eye Research Institute",37.791185,-122.43391,38692,1,38692,1
+"University of the District of Columbia",38.944441,-77.064327,492700.72,1,492700.72,1
+"Monell Chemical Senses Center",39.955743,-75.193059,265511.31,2,265511.31,2
+"Magee-Womens Research Institute",40.437078,-79.96154,4051053.63,2,4051053.63,2
+"Carnegie-Mellon University",40.442959,-79.941084,291119,1,291119,1
+"SUNY Downstate Medical Center",40.65537,-73.945077,557556.11,1,557556.11,1
+"Father Flanagan's Boys' Home",41.253446,-96.133857,136610.9822,2,136610.9822,2
+"Creighton University",41.264296,-95.948089,232290.09,2,232290.09,2
+"University of Toledo Health Science Campus",41.619554,-83.620727,416111.25,1,416111.25,1
+"Hebrew Rehabilitation Center for Aged",42.296681,-71.130734,4990952.92,1,4990952.92,1
+"Tufts University Medford",42.40117,-71.125362,14055.94,3,14055.94,1
+"University of South Dakota",42.78263,-96.925433,76578.0699999999,1,76578.0699999999,1
+"SUNY Upstate Medical University",43.042595,-76.14055,6207.15,1,6207.15,1
+"St. Catherine University",44.924882,-93.183134,641152.07,1,641152.07,1
+"Hennepin Healthcare Research Institute",44.972097,-93.262404,259243.69,1,259243.69,1
+"Hopa Mountain",45.678023,-111.033007,126731.06,1,126731.06,1
+"Ponce School of Medicine",18.01462,-66.614749,210628.48,1,210628.48,1
+"University of Puerto Rico Ponce",18.036114,-66.611434,2876.88,1,2876.88,1
+"University of Puerto Rico at Humacao",18.154496,-65.820757,277254.49,1,277254.49,1
+"University of the Virgin Islands",18.3419,-64.9307,16246.74,1,16246.74,1
+"University of Puerto Rico Rio Piedras",18.409826,-66.062956,140007.81,2,140007.81,1
+"University of Puerto Rico Medical Sciences",18.410481,-66.065613,5988659.57,4,5988659.57,4
+"University of Puerto Rico Comprehensive Cancer Center",18.388812,-66.073302,812162.36,1,812162.36,1
+"Grupo Nexos Inc.",18.420562,-66.053869,108503.86,1,108503.86,1
+"Urban Health Partnerships",25.758156,-80.199322,165898.69,1,165898.69,1
+"Health Choice Network, Inc.",25.784838,-80.341865,8746.1399999999,1,8746.1399999999,1
+"Asian American Health Coalition",29.715091,-95.553787,980142.35,1,980142.35,1
+"Healthy Tarrant County Collaboration",32.765454,-97.252866,495992.89,1,495992.89,1
+"University of Alabama",33.215665,-87.53919,231050.85,1,231050.85,1
+"Delta Health Alliance, Inc.",33.40757,-90.911217,104662.42,1,104662.42,1
+"Loma Linda University",34.051744,-117.261784,245106,1,245106,1
+"Housing Authority of the City of Los Angeles",34.060406,-118.281668,539864.46,1,539864.46,1
+"Arkansas Cancer Coalition",34.759836,-92.340415,551280.17,1,551280.17,1
+"North Carolina Department of Health and Human Services",35.670641,-78.663729,497053.92,1,497053.92,1
+"Tech Museum of Innovation",37.331476,-121.890183,56689.18,1,56689.18,1
+"Southern Illinois University at Edwardsville",38.811295,-89.956641,173649.85,1,173649.85,1
+"The Academy of Natural Sciences of Drexel University",39.957946,-75.171447,181668.18,1,181668.18,1
+"Asian Community Health Coalition",39.960695,-75.157059,357187.5,1,357187.5,1
+"Kean University",40.679579,-74.231879,30020.13,1,30020.13,1
+"New York Hall of Science",40.752572,-73.854759,277640.62,1,277640.62,1
+"Bronxworks, Inc.",40.851,-73.9081,270687.06,1,270687.06,1
+"Feonix - Mobility Rising",40.859135,-96.725607,156758.4,1,156758.4,1
+"Gordon Research Conferences",41.480003,-71.569648,3100,2,3100,1
+"The Baker Center",42.330928,-71.109909,410432.71,1,410432.71,1
+"Face Addiction Now",42.553717,-82.928158,24143.5,1,24143.5,1
+"Access Health Inc.",43.230962,-86.243109,81701.71,1,81701.71,1
+"University of Texas Dallas",32.991725,-96.743697,78559.36,1,78559.36,1
+"East Carolina University",35.608358,-77.364797,81429.46,1,81429.46,1
+"American University",38.936949,-77.089471,692703.97,1,692703.97,1
+"Mount Desert Island Biological Lab",44.430664,-68.28841,112293.86,1,112293.86,1
+"Claremont Graduate University",34.103277,-117.714467,172950.44,1,172950.44,1
+"Beckman Research Institute",34.127716,-117.972442,3532.26923076923,1,3532.26923076923,1
+"University of Kansas Lawrence",38.951542,-95.265562,318560.47,1,318560.47,1
+"Cincinnati Children's Hospital Medical Center",39.140663,-84.501007,550097,1,550097,1
+"Colorado School of Mines",39.75113,-105.222306,30551.37,1,30551.37,1
+"Rockefeller University",40.763746,-73.955386,52632.06,1,52632.06,1
+"New York Medical College",41.085531,-73.810253,67413.08,1,67413.08,1
+"State University of New York at Albany",42.691708,-73.825588,150910.56,1,150910.56,1

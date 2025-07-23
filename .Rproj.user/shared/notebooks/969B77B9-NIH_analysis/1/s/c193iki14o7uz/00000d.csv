@@ -1,0 +1,9 @@
+"0","comp %>% filter(pol_party == ""Democrat"" & static_IDC_loss != 0) %>% 
+  mutate(ratio = IDC_econ_loss/static_IDC_loss) %>% select(ratio) %>% summary
+"
+"1","[1m[33mError[39m in `filter()`:[22m
+[38;5;252m[36mℹ[38;5;252m In argument: `pol_party == ""Democrat"" & static_IDC_loss != 0`.[39m
+[1mCaused by error:[22m
+[33m![39m object 'pol_party' not found
+[90mRun `]8;;x-r-run:rlang::last_trace()rlang::last_trace()]8;;` to see where the error occurred.[39m
+"
