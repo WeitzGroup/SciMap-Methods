@@ -2,7 +2,8 @@
 # SciMap-Methods
 
 Code to accompany the manuscript "Economic Loss due to Health Funding
-Cuts as Distributed Across Geospatial Units"
+Cuts as Distributed Across Geospatial Units" bv Mallory J Harris, 
+Alyssa H Sinclair, Clio Andris, and Joshua S Weitz.
 
 The two scripts used to conduct all analyses NIH_impacts.Rmd (estimate
 county and district-level economic losses from IDC cap and terminated
