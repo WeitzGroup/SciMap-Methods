@@ -1,7 +1,7 @@
 
 # SciMap-Methods
 
-code to accompany the manuscript "Economic Loss due to Health Funding
+Code to accompany the manuscript "Economic Loss due to Health Funding
 Cuts as Distributed Across Geospatial Units"
 
 The two scripts used to conduct all analyses NIH_impacts.Rmd (estimate
