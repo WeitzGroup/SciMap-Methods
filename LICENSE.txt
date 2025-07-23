@@ -1,0 +1,21 @@
+Code to accompany the manuscript "Economic Loss due to Health Funding Cuts as Distributed Across Geospatial Units" 
+
+Mallory J Harris, Alyssa H Sinclair, Clio Andris, and Joshua S Weitz
+
+Contact: Mallory Harris
+University of Maryland
+Department of Biology and Institute for Health Computing
+mharr15@umd.edu
+
+Code: This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details (<http://www.gnu.org/licenses/>).
+
+Figures: CC-BY 4.0 Share, Adapt, Attribute
+https://creativecommons.org/licenses/by/4.0/
