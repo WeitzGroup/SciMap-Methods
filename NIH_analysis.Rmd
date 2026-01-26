@@ -1,0 +1,838 @@
+---
+title: "NIH_analysis"
+output: html_document
+date: "2025-05-23"
+---
+
+```{r setup, include=FALSE}
+#knitr::opts_chunkset(echo = TRUE)
+```
+
+
+# Setup
+
+```{r Packages}
+
+if (!require('rstudioapi')) BiocManager::install("rstudioapi");library(rstudioapi)
+
+library(ggpp)
+library(readxl)
+library(sf)
+library(magrittr)
+library(scales)
+library(cowplot)
+library(ggpubr)
+library(sf)
+library(kableExtra)
+library(knitr)
+library(tidyverse)
+library(fuzzyjoin)
+library(stringdist)
+
+
+options(scipen=999)
+
+```
+
+```{r fig1-points, echo=FALSE}
+NIH_clean_fips <- read.csv(file="output/NIH_clean_fips.csv")
+
+NIH_clean_fips %>% 
+  filter(FIPS %in% c("13089", "48201", "42003")) %>% 
+  select(org_name, lat, lon, FIPS, IDC_econ_loss) %>% 
+  group_by(org_name, lat, lon, FIPS) %>%
+  summarize(IDC_econ_loss = sum(IDC_econ_loss)) %>%
+  arrange(FIPS, desc(IDC_econ_loss)) %>%
+write.csv("figs/fig1-points.csv", row.names = FALSE)
+
+county_commute <- read.csv("output/county_commute_NIH.csv") %>%
+  mutate(DESTINATION = str_pad(DESTINATION, 5, pad = "0")) %>%
+  mutate(ORIGIN = str_pad(ORIGIN, 5, pad = "0")) %>%
+  filter(startsWith(DESTINATION, c("13089", "48201", "42003"))) %>%
+  mutate(IDC_econ_loss = proportion*IDC_econ_loss) %>%
+  mutate(DESTINATION = substr(DESTINATION, 0, 5)) %>%
+  filter(IDC_econ_loss != 0) %>%
+  select(ORIGIN, IDC_econ_loss, DESTINATION) %>%
+  write.csv("figs/fig1-vals.csv", row.names=FALSE)
+
+```
+
+```{r vals, echo=FALSE}
+urbanicity <- read.csv("data/Ruralurbancontinuumcodes2023.csv") %>%
+                mutate(FIPS = str_pad(FIPS, 5, pad = "0")) %>%
+                filter(Attribute=="RUCC_2023") %>%
+                mutate(urban = ifelse(Value %in% c("1", "2", "3"), TRUE, FALSE)) %>%
+                select(FIPS, urban) %>%
+                distinct() 
+
+county_commute_NIH_sum <- read.csv("output/NIH_impact_county.csv") %>%
+                             mutate(FIPS = str_pad(FIPS, 5, pad = "0"))
+
+commute_NIH <- read.csv("output/county_commute_NIH.csv") %>% 
+                mutate(DESTINATION = str_pad(DESTINATION, 11, pad = "0"),
+                     ORIGIN = str_pad(ORIGIN, 5, pad = "0"))
+                   
+static_loss <- read.csv("output/static_loss_county.csv") %>%
+                      mutate(FIPS = str_pad(FIPS, 5, pad = "0"))
+
+commute_NIH_sum <- read.csv("output/NIH_impact_county.csv") %>%
+                    mutate(FIPS = str_pad(FIPS, 5, pad = "0"))
+
+term_tab_ever <- read.csv("data/nih_terminations.csv") %>%
+  mutate(award_remaining = as.numeric(str_replace(total_estimated_remaining, "\\$", ""))) %>%
+  mutate(org_name = toupper(org_name)) %>%
+  mutate(award_remaining_noself = ifelse(cancellation_source == "Self reported", 0 , award_remaining)) %>%
+  # exclude reinstated grants
+    mutate(award_remaining = ifelse(award_remaining <0 , 0 , award_remaining),
+           award_remaining_noself = ifelse(award_remaining_noself <0 , 0 , award_remaining_noself)) 
+
+
+term_tab_orig <- read.csv("data/nih_terminations.csv") %>%
+  mutate(award_remaining = as.numeric(str_replace(total_estimated_remaining, "\\$", ""))) %>%
+  mutate(org_name = toupper(org_name)) %>%
+  mutate(award_remaining_noself = ifelse(cancellation_source == "Self reported", 0 , award_remaining)) %>%
+  # exclude reinstated grants
+  filter(is.na(reinstated_est_date)) %>%
+    mutate(award_remaining = ifelse(award_remaining <0 , 0 , award_remaining),
+           award_remaining_noself = ifelse(award_remaining_noself <0 , 0 , award_remaining_noself)) 
+
+
+comp <- static_loss %>% 
+  select(IDC_econ_loss, terminated_econ_loss, FIPS) %>%
+  rename(static_IDC_loss = IDC_econ_loss,
+         static_term_loss = terminated_econ_loss) %>%
+  right_join(commute_NIH_sum) %>%
+  select(FIPS, IDC_econ_loss, IDC_loss, IDC_job_loss, static_IDC_loss, terminated_econ_loss, static_term_loss, county, state) %>%
+  mutate(static_IDC_loss = replace_na(static_IDC_loss, 0),
+         static_term_loss = replace_na(static_term_loss, 0)) %>% 
+  left_join(urbanicity) %>%
+  filter(! state %in% c("Guam", "American Samoa", "Puerto Rico", "Virgin Islands")) 
+
+write.csv(comp %>% select(FIPS, static_IDC_loss, IDC_econ_loss), "output/static_vs_commuter_IDC_FIPS.csv", row.names=FALSE)
+write.csv(comp %>% select(FIPS, static_term_loss, terminated_econ_loss), "output/static_vs_commuter_term_FIPS.csv", row.names=FALSE)
+
+static_loss_CD <- read.csv("output/static_loss_cong.csv") %>%
+                      mutate(GEOID = str_pad(GEOID, 4, pad = "0"))
+
+commute_NIH_sum_CD <- read.csv("output/NIH_impact_cong.csv") %>%
+                    mutate(GEOID = str_pad(GEOID, 4, pad = "0"))
+
+comp_CD <- static_loss_CD %>% 
+  select(IDC_econ_loss, terminated_econ_loss, GEOID) %>%
+  rename(static_IDC_loss = IDC_econ_loss,
+         static_term_loss = terminated_econ_loss) %>%
+  right_join(commute_NIH_sum_CD) %>%
+  select(GEOID, IDC_econ_loss, static_IDC_loss, terminated_econ_loss, static_term_loss, pol_party, state) %>%
+  mutate(static_IDC_loss = replace_na(static_IDC_loss, 0),
+         static_term_loss = replace_na(static_term_loss, 0)) %>% 
+  filter(! state %in% c("Guam", "American Samoa", "Puerto Rico", "Virgin Islands")) %>%
+  filter(GEOID != "0000")
+
+write.csv(comp_CD, file="output/static_vs_commuter-CD.csv", row.names=FALSE)
+
+
+
+# Various stats that appear in manuscript
+tot_loss <- comp$static_IDC_loss %>% sum(na.rm=TRUE)
+tot_loss
+comp %>% filter(static_IDC_loss!=0) %>% nrow()
+comp %>% filter(IDC_econ_loss>100000) %>% dim()
+comp %>% filter(static_term_loss!=0) %>% nrow
+comp %>% filter(terminated_econ_loss>100000) %>% dim()
+sum(comp$terminated_econ_loss)/10^9
+sum(comp$IDC_econ_loss)/10^9
+
+term_tab_ever %>% dim()
+sum(term_tab_ever$award_remaining, na.rm=TRUE)
+
+# main results
+comp %>% filter(static_IDC_loss==0) %>% nrow()
+comp %>% filter(static_IDC_loss!=0) %>% nrow()
+sum(comp$static_IDC_loss)
+comp %>% arrange(desc(static_IDC_loss)) %>% 
+  select(static_IDC_loss, county) %>% head()
+sum(comp$static_IDC_loss)
+comp %>% filter(IDC_econ_loss < 1) %>% dim()
+comp %>% filter(IDC_econ_loss>100000) %>% dim()
+
+
+comp %>% filter(IDC_econ_loss>100000 & static_IDC_loss==0) %>% dim()
+comp_CD %>% filter(IDC_econ_loss > 100000) %>% dim()
+
+
+out_loss <- commute_NIH %>% 
+                mutate(DESTINATION = substr(DESTINATION, 1, 5)) %>%
+                filter(DESTINATION != ORIGIN) %>% 
+                mutate(prop_loss = IDC_econ_loss * proportion) %>% 
+                select(prop_loss) %>%
+                sum(na.rm=TRUE)
+
+out_loss
+out_loss/tot_loss
+
+
+comp %>% filter(static_IDC_loss==0) %>% select(IDC_econ_loss) %>% summary()
+
+comp %>% 
+  filter(static_IDC_loss < IDC_econ_loss & static_IDC_loss > 0) %>%
+  nrow()
+
+comp %>%
+  filter(static_IDC_loss != 0) -> static_loss_df
+
+cor.test(static_loss_df$static_IDC_loss, static_loss_df$IDC_econ_loss, method = "spearman")
+
+# Table for high in-flow counties
+tab <- comp %>%
+  arrange(desc(IDC_econ_loss/(1+static_IDC_loss))) %>%
+  select(county, state, IDC_econ_loss, static_IDC_loss, IDC_loss, IDC_job_loss, FIPS) %>%
+  head(5) %>%
+  mutate(Name = paste(str_to_title(county), state, sep=", ")) %>%
+  mutate(`Economic Loss (Static)` = paste0("$", round(static_IDC_loss/1000000, digits=0), "M")) %>%
+  mutate(`Economic Loss (Commuter)` = paste0("$", round(IDC_econ_loss/1000000, digits=0), "M")) %>%
+  mutate(`Job Loss (Commuter)` = round(IDC_job_loss, digits=0)) %>%
+  select(Name, `Economic Loss (Commuter)`, `Job Loss (Commuter)`, FIPS)
+
+comp %>%
+  filter(static_IDC_loss!=0) %>%
+  arrange((IDC_econ_loss/(1+static_IDC_loss))) %>%
+  select(county, state, IDC_econ_loss, static_IDC_loss, IDC_loss, IDC_job_loss, FIPS) %>%
+  head(5) %>%
+  mutate(Name = paste(str_to_title(county), state, sep=", ")) %>%
+  mutate(`Economic Loss (Static)` = paste0("$", round(static_IDC_loss/1000000, digits=0), "M")) %>%
+  mutate(`Economic Loss (Commuter)` = paste0("$", round(IDC_econ_loss/1000000, digits=0), "M")) %>%
+  mutate(`Job Loss (Commuter)` = round(IDC_job_loss, digits=0)) %>%
+  select(Name, `Economic Loss (Commuter)`, `Job Loss (Commuter)`, FIPS)
+
+
+form_tab <- kable(tab %>% select(-FIPS), format="latex", booktabs=TRUE) %>%
+  kable_styling(latex_options = "scale_down")
+
+cat(form_tab, file="figs/table.tex")
+
+
+top_inst_df <- read.csv("output/county_commute_NIH_inst.csv") %>%
+    mutate(FIPS = str_pad(FIPS, 5, pad = "0")) 
+
+top_inst_inflow <- data.frame()
+
+for(my_fips in tab$FIPS){
+  top_inst_inflow <- rbind(top_inst_inflow, filter(top_inst_df, my_fips == FIPS))
+}
+
+top_inst_inflow %>% 
+  select(FIPS, org_name, IDC_econ_loss, IDC_job_loss) %>%
+  mutate(IDC_econ_loss = IDC_econ_loss/10^6)
+
+sum(comp$terminated_econ_loss)
+comp %>% filter(static_term_loss>0) %>% nrow()
+top_term <- arrange(comp, desc(static_term_loss)) %>% select(FIPS, static_term_loss) %>% mutate(static_term_loss=static_term_loss/1000000000) %>% head(10) 
+
+# get names of top_term
+read.csv("data/county_pop.csv") %>%
+    mutate(FIPS = str_pad(FIPS, 5, pad = "0")) %>%
+    right_join(top_term) %>% arrange(desc(static_term_loss))
+
+comp %>% filter(terminated_econ_loss >100000) %>% nrow()
+
+out_loss <- commute_NIH %>% 
+                mutate(DESTINATION = substr(DESTINATION, 1, 5)) %>%
+                filter(DESTINATION != ORIGIN) %>% 
+                mutate(prop_loss = terminated_econ_loss * proportion) %>% 
+                select(prop_loss) %>%
+                sum(na.rm=TRUE)
+
+out_loss
+out_loss/sum(comp$terminated_econ_loss)
+
+
+static_loss %>% 
+  mutate(combined = IDC_econ_loss+terminated_econ_loss-overlap_econ_loss) %>%
+  summarize(sum(combined,na.rm=TRUE)/10^9)
+```
+
+```{r fig3}
+
+log10pseudo_trans <- trans_new(
+  "log10pseudo",
+  transform = function(x) log10(x + 1),
+  inverse = function(x) 10^x - 1
+)
+
+
+hist_lim <- max(comp$IDC_econ_loss[comp$static_IDC_loss==0],
+                comp$terminated_econ_loss[comp$static_term_loss==0])
+
+points_lim <- max(comp$IDC_econ_loss[comp$static_IDC_loss!=0],
+                  comp$static_IDC_loss[comp$static_IDC_loss!=0],
+                comp$terminated_econ_loss[comp$static_term_loss!=0],
+                comp$static_term_loss[comp$static_term_loss!=0])+10
+
+fig3a <- comp %>% 
+          filter(static_IDC_loss == 0) %>%
+          ggplot() +
+            geom_histogram(aes(x=IDC_econ_loss)) + 
+            scale_x_continuous(transform=log10pseudo_trans,
+                               breaks=c(0, 10^seq(1, 9, by=1)),
+                               labels = c("0","10", "100", "1K", "10K", "100K", "1M", "10M", "100M", "1B"),
+                               limits=c(0, hist_lim))+
+            xlab("Commuter: Economic Loss ($)")+
+            ylab("Count")+
+            geom_text_npc(aes(npcx = "left", npcy = "top",#hjust=0, vjust=1, 
+                            label = paste0("No local affected orgs \n(", 
+                                   sum(comp$static_IDC_loss==0), " counties)")), 
+                        label.size=2, size.unit = "pt", check_overlap=T)+
+            theme_classic()+
+            theme(plot.margin = margin(40, 15, 5, 5),
+                  axis.text = element_text(size = 9),
+                  axis.title = element_text(size = 11),
+                  plot.title = element_text(size = 11, face = "bold", hjust=1, vjust = 1.1))
+
+fig3b <- comp %>% 
+          filter(static_IDC_loss != 0) %>%
+          ggplot() +
+            geom_point(shape = 1, aes(y=IDC_econ_loss, x=static_IDC_loss)) + 
+            scale_y_continuous(transform=log10pseudo_trans,
+                               breaks=c(0, 10^seq(1, 9, by=1)),
+                               labels = c("0","10", "100", "1K", "10K", "100K", "1M", "10M", "100M", "1B"),
+                               limits=c(1000, points_lim))+
+            scale_x_continuous(transform=log10pseudo_trans,
+                               breaks=c(0, 10^seq(1, 9, by=1)),
+                               labels = c("0","10", "100", "1K", "10K", "100K", "1M", "10M", "100M", "1B"),
+                               limits=c(1000, points_lim))+
+            xlab("Static: Economic Loss ($)")+
+            ylab("Commuter: Economic Loss ($)")+
+            geom_text_npc(aes(npcx = "left", npcy = "top",#hjust=0, vjust=1, 
+                            label = paste0("Local affected orgs \n(", 
+                                   sum(comp$static_IDC_loss!=0), " counties)")), 
+                        label.size=2, size.unit = "pt", check_overlap=T)+
+            geom_abline(slope=1, intercept=0, color="darkred")+
+            theme_classic()+
+            theme(plot.margin = margin(40, 15, 5, 5),
+                  axis.text = element_text(size = 9),
+                  axis.title = element_text(size = 11),
+                  plot.title = element_text(size = 11, face = "bold", hjust=1, vjust = 1.1))
+
+
+
+fig3c <- comp %>% 
+          filter(static_term_loss == 0) %>%
+          ggplot() +
+            geom_histogram(aes(x=terminated_econ_loss)) + 
+            scale_x_continuous(transform=log10pseudo_trans,
+                               breaks=c(0, 10^seq(1, 9, by=1)),
+                               labels = c("0","10", "100", "1K", "10K", "100K", "1M", "10M", "100M", "1B"),
+                               limits=c(0, hist_lim))+
+            scale_y_continuous(limits=c(0, 320))+
+            xlab("Commuter: Economic Loss ($)")+
+            ylab("Count")+
+            geom_text_npc(aes(npcx = "left", npcy = "top",#hjust=0, vjust=1, 
+                              label = paste0("No local affected orgs \n(", 
+                                     sum(comp$static_term_loss==0), " counties)")), 
+                          label.size=2, size.unit = "pt", check_overlap=T)+
+            theme_classic()+
+            theme(plot.margin = margin(40, 15, 5, 5),
+                  axis.text = element_text(size = 9),
+                  axis.title = element_text(size = 11),
+                  plot.title = element_text(size = 11, face = "bold", hjust=1, vjust = 1.1))
+
+
+fig3d <- comp %>% 
+          filter(static_term_loss != 0) %>%
+          ggplot() +
+            geom_point(shape = 1, aes(y=terminated_econ_loss, x=static_term_loss)) + 
+            scale_y_continuous(transform=log10pseudo_trans,
+                               breaks=c(0, 10^seq(1, 9, by=1)),
+                               labels = c("0","10", "100", "1K", "10K", "100K", "1M", "10M", "100M", "1B"),
+                               limits=c(1000, points_lim))+
+            scale_x_continuous(transform=log10pseudo_trans,
+                               breaks=c(0, 10^seq(1, 9, by=1)),
+                               labels = c("0","10", "100", "1K", "10K", "100K", "1M", "10M", "100M", "1B"),
+                               limits=c(1000, points_lim))+
+            xlab("Static: Economic Loss ($)")+
+            ylab("Commuter: Economic Loss ($)")+
+            geom_text_npc(aes(npcx = "left", npcy = "top",#hjust=0, vjust=1, 
+                              label = paste0("Local affected orgs \n(", 
+                                     sum(comp$static_term_loss!=0), " counties)")), 
+                          label.size=2, size.unit = "pt", check_overlap=T)+
+            geom_abline(slope=1, intercept=0, color="darkred")+
+            theme_classic()+
+            theme(plot.margin = margin(40, 15, 5, 5),
+                  axis.text = element_text(size = 9),
+                  axis.title = element_text(size = 11),
+                  plot.title = element_text(size = 11, face = "bold", hjust=1, vjust = 1.1))
+
+
+plot_grid(fig3a,
+          fig3b,
+          fig3c,
+          fig3d,
+          nrow=2,
+          labels = c("A. Economic Losses from Proposed IDC Cap \nin Counties without Local Affected Organizations", 
+                     "B. Economic Losses from Proposed IDC Cap \nin Counties with Local Affected Organizations",
+                     "C. Economic Losses from Terminated/Frozen Grants \nin Counties without Local Affected Organizations", 
+                     "D. Economic Losses from Terminated/Frozen Grants \nin Counties with Local Affected Organizations"),
+          hjust=0, label_size=11, align="h")
+
+ggsave(file="figs/fig3.pdf", height=8, width=8)
+
+
+```
+
+```{r breakdown by urbanicity and partisanship}
+
+get_legend_35 <- function(plot) {
+  # return all legend candidates
+  legends <- get_plot_component(plot, "guide-box", return_all = TRUE)
+  # find non-zero legends
+  nonzero <- vapply(legends, \(x) !inherits(x, "zeroGrob"), TRUE)
+  idx <- which(nonzero)
+  # return first non-zero legend if exists, and otherwise first element (which will be a zeroGrob) 
+  if (length(idx) > 0) {
+    return(legends[[idx[1]]])
+  } else {
+    return(legends[[1]])
+  }
+}
+
+
+hist_lim <- max(comp$IDC_econ_loss[comp$static_IDC_loss==0],
+                comp$terminated_econ_loss[comp$static_term_loss==0])
+
+points_lim <- range(c(comp$IDC_econ_loss[comp$static_IDC_loss!=0],
+                  comp$static_IDC_loss[comp$static_IDC_loss!=0]))[2]
+
+f_urba <- comp %>%
+          filter(static_IDC_loss == 0) %>%
+          ggplot() +
+            geom_histogram(aes(x=IDC_econ_loss, fill=urban), alpha=.5, position="identity") +
+                        scale_x_continuous(transform=log10pseudo_trans,
+                               breaks=c(0, 10^seq(1, 8, by=1)),
+                               labels = c("0","10", "100", "1K", "10K", "100K", "1M", "10M", "100M"),
+                               limits=c(0, hist_lim))+
+            geom_text_npc(aes(npcx = "left", npcy = "top",#hjust=0, vjust=1, 
+                              label = paste0("No local affected orgs \n(", 
+                                     sum(comp$static_IDC_loss==0 & comp$urban == TRUE), " metro counties \n",
+                                     sum(comp$static_IDC_loss==0 & comp$urban != TRUE), " non-metro counties)")), 
+                          label.size=2, size.unit = "pt", check_overlap=T)+
+            xlab("Commuter: Economic Loss ($)")+
+            ylab("Count")+
+            ylim(c(0,460))+
+            # annotate("text", y = 450, x = 0, hjust=1, vjust = 0, size=3,
+            #           label = paste0("No Local Affected Organizations \n(",
+            #                          sum(comp$static_IDC_loss==0), " counties)"))+
+            theme_classic()+
+            theme(plot.margin = margin(40, 15, 5, 5),
+                  axis.text = element_text(size = 9),
+                  axis.title = element_text(size = 11),
+                  plot.title = element_text(size = 11, face = "bold", hjust=1, vjust = 1.1))+
+            scale_fill_manual("", values = c("FALSE" = "#5BA300", "TRUE" = "blue"),
+                              labels = c("FALSE" = "Non-metro", "TRUE" = "Metro")) +
+            theme(legend.position="bottom")
+
+
+
+f_urbb <- comp %>%
+          filter(static_IDC_loss != 0) %>%
+          ggplot() +
+            geom_point(shape = 1, aes(y=IDC_econ_loss, x=static_IDC_loss, color=urban)) +
+            scale_y_continuous(transform=log10pseudo_trans,
+                               breaks=c(0, 10^seq(1, 8, by=1)),
+                               labels = c("0","10", "100", "1K", "10K", "100K", "1M", "10M", "100M"),
+                               limits=c(1000, points_lim))+
+            scale_x_continuous(transform=log10pseudo_trans,
+                               breaks=c(0, 10^seq(1, 8, by=1)),
+                               labels = c("0","10", "100", "1K", "10K", "100K", "1M", "10M", "100M"),
+                               limits=c(1000, points_lim))+
+            xlab("Static: Economic Loss ($)")+
+            ylab("Commuter: Economic Loss ($)")+
+            geom_text_npc(aes(npcx = "right", npcy = "bottom",#hjust=0, vjust=1, 
+                            label = paste0("Local affected orgs \n(", 
+                                     sum(comp$static_IDC_loss!=0 & comp$urban == TRUE), " metro counties \n",
+                                     sum(comp$static_IDC_loss!=0 & comp$urban != TRUE), " non-metro counties)")), 
+                        label.size=2, size.unit = "pt", check_overlap=T)+
+            geom_abline(slope=1, intercept=0, color="darkred")+
+            theme_classic()+
+            theme(plot.margin = margin(40, 15, 5, 5),
+                  axis.text = element_text(size = 9),
+                  axis.title = element_text(size = 11),
+                  plot.title = element_text(size = 11, face = "bold", hjust=1, vjust = 1.1))+
+            scale_color_manual("", values = c("FALSE" = "#5BA300", "TRUE" = "blue"),
+                              labels = c("FALSE" = "Non-metro", "TRUE" = "Metro")) +
+            theme(legend.position="none")
+
+urb_leg <- get_legend_35(f_urba)
+
+urb_plot <- plot_grid(f_urba+theme(legend.position="none"), f_urbb, nrow = 1,
+                      labels=c("A. Economic Losses from Proposed IDC Cap \nin Counties without Local Affected Organizations", "B. Economic Losses from Proposed IDC Cap \nin Counties with Local Affected Organizations"),
+          hjust=0, label_size=11, align="h") %>%
+              plot_grid(., urb_leg, nrow=2, rel_heights = c(9,1))
+
+hist_lim_CD <- max(comp_CD$IDC_econ_loss[comp_CD$static_IDC_loss==0],
+                comp_CD$terminated_econ_loss[comp_CD$static_term_loss==0])
+
+points_lim_CD <- range(c(comp_CD$IDC_econ_loss[comp_CD$static_IDC_loss!=0],
+                  comp_CD$static_IDC_loss[comp_CD$static_IDC_loss!=0]))
+
+f_para <- comp_CD %>% 
+          filter(static_IDC_loss == 0 & !is.na(pol_party) & pol_party != "Vacant") %>%
+          ggplot() +
+            geom_histogram(aes(x=IDC_econ_loss, fill=pol_party), alpha=.5, position="identity") + 
+            scale_x_continuous(transform=log10pseudo_trans,
+                               breaks=c(0, 10^seq(1, 8, by=1)),
+                               labels = c("0","10", "100", "1K", "10K", "100K", "1M", "10M", "100M"),
+                              limits=c(0, hist_lim_CD))+
+            xlab("Commuter: Economic Loss ($)")+
+            ylab("Count")+
+            geom_text_npc(aes(npcx = "left", npcy = "top",#hjust=0, vjust=1, 
+                            label = paste0("No local affected orgs \n(", 
+                                    sum(comp_CD$static_IDC_loss==0 & comp_CD$pol_party == "Republican", na.rm=TRUE), " Rep. districts \n",
+                                    sum(comp_CD$static_IDC_loss==0 & comp_CD$pol_party == "Democrat", na.rm=TRUE), " Dem. districts)")), 
+                        label.size=2, size.unit = "pt", check_overlap=T)+
+            theme_classic()+
+            theme(plot.margin = margin(40, 15, 5, 5),
+                  axis.text = element_text(size = 9),
+                  axis.title = element_text(size = 11),
+                  plot.title = element_text(size = 11, face = "bold", hjust=1, vjust = 1.1))+
+            scale_fill_manual("", values = c("Republican" = "#E81B23", "Democrat" = "#1666CB")) +
+            theme(legend.position="bottom")
+
+
+
+f_parb <- comp_CD %>% 
+          filter(static_IDC_loss != 0 & !is.na(pol_party) & pol_party != "Vacant") %>%
+          ggplot() +
+            geom_point(shape = 1, aes(y=IDC_econ_loss, x=static_IDC_loss, color=pol_party)) + 
+            scale_y_continuous(transform=log10pseudo_trans,
+                               breaks=c(0, 10^seq(1, 8, by=1)),
+                               labels = c("0","10", "100", "1K", "10K", "100K", "1M", "10M", "100M"),
+                               limits=c(1000,points_lim_CD[2]))+
+            scale_x_continuous(transform=log10pseudo_trans,
+                               breaks=c(0, 10^seq(1, 8, by=1)),
+                               labels = c("0","10", "100", "1K", "10K", "100K", "1M", "10M", "100M"),
+                               limits=c(1000,points_lim_CD[2]))+
+            xlab("Static: Economic Loss ($)")+
+            ylab("Commuter: Economic Loss ($)")+
+            geom_text_npc(aes(npcx = "right", npcy = "bottom",#hjust=0, vjust=1, 
+                            label = paste0("Local affected orgs \n(", 
+                                    sum(comp_CD$static_IDC_loss!=0 & comp_CD$pol_party == "Republican"), " Rep. districts \n",
+                                    sum(comp_CD$static_IDC_loss!=0 & comp_CD$pol_party == "Democrat"), " Dem. districts)")), 
+                        label.size=2, size.unit = "pt", check_overlap=T)+
+            # annotate("text", x = 1.5*10^9, y = 1000, hjust=1, vjust = 0, size=3,
+            #         label = paste0("Local Affected Organizations \n(", 
+            #                        sum(comp$static_IDC_loss!=0), " counties)"))+
+            geom_abline(slope=1, intercept=0, color="darkred")+
+            theme_classic()+
+            theme(plot.margin = margin(40, 15, 5, 5),
+                  axis.text = element_text(size = 9),
+                  axis.title = element_text(size = 11),
+                  plot.title = element_text(size = 11, face = "bold", hjust=1, vjust = 1.1))+
+            scale_color_manual("", values = c("Republican" = "#E81B23", "Democrat" = "#1666CB")) +
+            theme(legend.position="none")
+
+
+par_leg <- get_legend_35(f_para)
+
+par_plot <- plot_grid(f_para+theme(legend.position="none"), f_parb, nrow = 1,
+                      labels=c("C. Economic Losses from Proposed IDC Cap \nin Districts without Local Affected Organizations", "D. Economic Losses from Proposed IDC Cap \nin Districts with Local Affected Organizations"),
+          hjust=0, label_size=11, align="h") %>%
+              plot_grid(., par_leg, nrow=2, rel_heights = c(9,1))
+
+plot_grid(urb_plot, par_plot, nrow=2)
+
+ggsave(file="figs/figs2.pdf", height=8, width=8)
+
+```
+
+```{r urb-par-stats}
+# Additional statistics comparing losses depending on urbanicity/partisanship
+comp %>% filter(urban == TRUE & static_IDC_loss == 0) %>% select(IDC_econ_loss) %>% nrow()
+comp %>% filter(urban == TRUE & static_IDC_loss == 0) %>% select(IDC_econ_loss) %>% summary()
+
+comp %>% filter(urban == FALSE & static_IDC_loss == 0) %>% select(IDC_econ_loss) %>% nrow()
+comp %>% filter(urban == FALSE & static_IDC_loss == 0) %>% select(IDC_econ_loss) %>% summary()
+
+comp %>% filter(urban == TRUE & static_IDC_loss != 0) %>% 
+  mutate(ratio = IDC_econ_loss/static_IDC_loss) %>% select(ratio) %>% summary
+
+comp %>% filter(urban == FALSE & static_IDC_loss != 0) %>% 
+  mutate(ratio = IDC_econ_loss/static_IDC_loss) %>% select(ratio) %>% summary
+
+
+comp_CD %>% filter(pol_party == "Republican" & static_IDC_loss == 0) %>% select(IDC_econ_loss) %>% nrow()
+comp_CD %>% filter(pol_party == "Republican" & static_IDC_loss == 0)  %>% select(IDC_econ_loss) %>% summary()
+
+comp_CD %>% filter(pol_party == "Democrat" & static_IDC_loss == 0) %>% select(IDC_econ_loss) %>% nrow()
+comp_CD %>% filter(pol_party == "Democrat" & static_IDC_loss == 0)  %>% select(IDC_econ_loss) %>% summary()
+
+comp_CD %>% filter(pol_party == "Republican" & static_IDC_loss != 0) %>% 
+  mutate(ratio = IDC_econ_loss/static_IDC_loss) %>% select(ratio) %>% summary
+
+comp_CD %>% filter(pol_party == "Democrat" & static_IDC_loss != 0) %>% 
+  mutate(ratio = IDC_econ_loss/static_IDC_loss) %>% select(ratio) %>% summary
+
+```
+
+```{r table-urb-pol}
+# classify as metro, metro-adjacent, or nonmetro
+comp %>%
+# population size
+    left_join(read.csv("data/county_pop.csv") %>%
+                  mutate(FIPS = str_pad(FIPS, 5, pad = "0")) %>%
+                  select(FIPS, pop_2024))  %>%
+    arrange(desc(IDC_econ_loss)) %>%
+# group by urbanicity
+    group_by(urban) %>%
+# get values for table
+    summarize(static_count = sum(static_IDC_loss >= 100000),
+              commuter_count = sum(IDC_econ_loss >= 100000),
+              total_loss = mean(IDC_econ_loss)/10^6,
+              avg_percap_loss = mean(IDC_econ_loss/(pop_2024))*100000/10^6) %>%
+   mutate(total_loss = paste0("$", round(total_loss, digits=2)),
+         avg_percap_loss = paste0("$", round(avg_percap_loss, digits=2))) %>%
+  kable(format="latex", booktabs=TRUE) %>%
+  kable_styling(latex_options = "scale_down") %>%
+cat(file="figs/county_urb.tex")
+
+# top 3 per category organized by 
+comp %>%
+    left_join(read.csv("data/county_pop.csv") %>%
+                  mutate(FIPS = str_pad(FIPS, 5, pad = "0")) %>%
+                  select(FIPS, pop_2024))  %>%
+    filter(static_IDC_loss == 0 & IDC_econ_loss > 100000) %>%
+    mutate(percap_IDC_loss = IDC_econ_loss/pop_2024*100000/10^6) %>%
+    select(FIPS,county, state, urban, pop_2024, percap_IDC_loss, IDC_econ_loss) %>%
+    group_by(urban) %>%
+  slice_max(pop_2024, n=3)
+
+# classify as Republican, intermediate, or Democratic
+comp_CD_tab <- read.csv("data/CD_pop2024.csv") %>%
+  mutate(state = sub(" [^ ]+$", "", District),
+         dist_num = as.numeric(sub(".*\\s+", "", District)),
+         pop_2024 = as.numeric(gsub(",", "", Population))) %>%
+  mutate(dist_num = ifelse(is.na(dist_num), 0, dist_num)) %>%
+  # manually set DC
+  mutate(dist_num = ifelse(state == "District of Columbia", 98, dist_num)) %>%
+  # append state FIPS
+  right_join(comp_CD %>% 
+               select(state, GEOID) %>% 
+               mutate(state_GEOID = substr(GEOID, 1, 2)) %>% 
+               select(state_GEOID, state) %>% 
+               distinct) %>%
+  mutate(dist_num = str_pad(dist_num, 2, pad = "0")) %>%
+  mutate(GEOID = paste0(state_GEOID, dist_num)) %>%
+  select(GEOID, pop_2024) %>%
+  distinct() %>%
+  right_join(comp_CD) 
+
+comp_CD_tab %>%
+  group_by(pol_party) %>%
+  # get values for table
+  summarize(top3 = paste(head(GEOID,3), collapse=" "),
+            top3_vals = paste(head(IDC_econ_loss,3), collapse=" "),
+            static_count = sum(static_IDC_loss >= 100000),
+            commuter_count = sum(IDC_econ_loss >= 100000),
+            total_loss = mean(IDC_econ_loss)/10^6,
+            avg_percap_loss = mean(IDC_econ_loss/(pop_2024)*100000/10^6)) %>%
+  mutate(total_loss = paste0("$", round(total_loss, digits=2)),
+         avg_percap_loss = paste0("$", round(avg_percap_loss, digits=2))) %>%
+  kable(format="latex", booktabs=TRUE) %>%
+  kable_styling(latex_options = "scale_down") %>%
+cat(file="figs/CD_partisanship.tex")
+
+
+comp_CD_tab %>%
+    filter(static_IDC_loss == 0 & IDC_econ_loss > 100000) %>%
+    mutate(percap_IDC_loss = IDC_econ_loss/pop_2024*100000/10^6) %>%
+    select(GEOID, state, pol_party, pop_2024, percap_IDC_loss, IDC_econ_loss) %>%
+    group_by(pol_party) %>%
+  slice_max(IDC_econ_loss, n=3)
+
+```
+
+```{r sens-rho25}
+county_sens <- read.csv("output/NIH_impact_county-sens.csv") %>%
+                    mutate(FIPS = str_pad(FIPS, 5, pad = "0")) %>%
+                    filter(mult == .2) %>%
+                    select("FIPS", "IDC_econ_loss", "terminated_econ_loss") %>%
+                    rename(IDC_sens = IDC_econ_loss,
+                           term_sens = terminated_econ_loss)
+
+county_main <- read.csv("output/NIH_impact_county.csv") %>%
+                    mutate(FIPS = str_pad(FIPS, 5, pad = "0")) %>%
+                    rename(IDC_main = IDC_econ_loss,
+                           term_main = terminated_econ_loss) %>%
+                    left_join(county_sens)
+
+p1<-ggplot(county_main) + 
+  geom_point(aes(x=IDC_main, y=IDC_sens), shape=1)+
+  theme_classic() +
+  scale_y_continuous(trans = pseudo_log_trans(),
+                expression("Economic Loss ($), " * rho * " =0.25"),
+                breaks=c(0, 10^seq(1, 9, by=1)),
+                labels = c("0","10", "100", "1K", "10K", "100K", "1M", "10M", "100M", "1B"),
+                limits = c(0, max(county_main$IDC_main, county_main$IDC_sens)))+
+  scale_x_continuous(trans = pseudo_log_trans(),
+                expression("Economic Loss ($), " * rho * " =0.00"),
+                breaks=c(0, 10^seq(1, 9, by=1)),
+                labels = c("0","10", "100", "1K", "10K", "100K", "1M", "10M", "100M", "1B"),
+                limits = c(0, max(county_main$IDC_main, county_main$IDC_sens)))+
+  geom_abline(slope=1, intercept=0, colour="red")
+
+p2<-ggplot(county_main) + 
+  geom_point(aes(x=term_main, y=term_sens), shape=1)+
+  theme_classic() +
+  scale_y_continuous(trans = pseudo_log_trans(),
+                expression("Economic Loss ($), " * rho * " =0.25"),
+                breaks=c(0, 10^seq(1, 10, by=1)),
+                labels = c("0","10", "100", "1K", "10K", "100K", "1M", "10M", "100M", "1B", "10B"),
+                limits = c(0, max(county_main$term_main, county_main$term_sens)))+
+  scale_x_continuous(trans = pseudo_log_trans(),
+                    expression("Economic Loss ($), " * rho * " =0.00"),
+                breaks=c(0, 10^seq(1, 10, by=1)),
+                labels = c("0","10", "100", "1K", "10K", "100K", "1M", "10M", "100M", "1B", "10B"),
+                limits = c(0, max(county_main$term_main, county_main$term_sens)))+
+  geom_abline(slope=1, intercept=0, colour="red")
+
+plot_grid(p1+theme(plot.margin = unit(c(1, 0, 0, 0), "cm")), 
+          p2+theme(plot.margin = unit(c(1, 0, 0, 0), "cm")), 
+          labels = c("A. Indirect Cost Cap", "B.Terminated/Frozen Grants"), 
+          hjust=0)
+ggsave(file="figs/fig-supp-rho25.pdf", height=4, width=8)
+
+county_main %>% filter(IDC_sens>100000) %>% dim()
+county_main %>% filter(IDC_main>100000) %>% dim()
+county_main %>% filter(term_sens>100000) %>% dim()
+county_main %>% filter(term_main>100000) %>% dim()
+  
+
+```
+
+```{r prop-static}
+county_varystatic <- read.csv("output/NIH_impact_county-sens.csv")
+
+county_varystatic %>%
+  group_by(mult) %>%
+  summarize(num_100k = sum(IDC_econ_loss > 100000)) %>%
+  ggplot()+
+  geom_point(aes(x=mult, y=num_100k))+
+  labs(y="Number of Counties with Future Losses > $100K",
+       x=expression("Proportion Static (" * rho * ")")) +
+  theme_classic() +  
+  geom_segment(aes(x = .2, xend = 0, y = -0.05, yend = -0.05),
+    arrow = arrow(type = "closed", length = unit(0.2, "cm"))) +
+  annotate("text", x = 0.2, y = 100, label = "Commuter", size = 4, hjust=1) +
+  geom_segment( aes(x = .8, xend = 1, y = -0.1, yend = -0.1),
+    arrow = arrow(type = "closed", length = unit(0.2, "cm"))) +
+  annotate("text", x = 0.8, y = 100, label = "Static", size = 4, hjust=0) 
+
+ggsave(file="figs/fig-supp-varyrho.pdf", height=4, width=4)
+
+county_varystatic %>%
+  group_by(mult) %>%
+  summarize(num_100k = sum(IDC_econ_loss > 100000)) %>%
+  filter(num_100k > 1000)
+```
+
+```{r state-mult}
+read.csv("data/state-multiplier-urm.csv") %>% 
+        rename(tot_fund = 2, 
+               econ_act = 9,
+               state= 1) %>%
+        mutate(econ_act = as.numeric(gsub(",", "", econ_act)),
+               tot_fund = as.numeric(gsub(",", "", tot_fund))) %>%
+        mutate(econ_mult = econ_act/tot_fund) %>%
+        select(state, econ_mult) %>%
+  ggplot(aes(x=econ_mult)) +
+  geom_histogram(fill = "white", color = "black")+
+  geom_vline(xintercept=2.56, color="maroon", lty="dashed")+
+  labs(x="Economic Multiplier",
+       y="Count (States)")+
+  theme_classic()+
+  scale_y_continuous(breaks=seq(from=0, to=8, by=2),
+                     expand = c(0, 0))
+
+
+ggsave("figs/supp-state_mult_hist.png", width=8, height=4, dpi=300)
+
+comp_natl <- read.csv("output/NIH_impact_county-natlmult.csv") %>%
+              mutate(FIPS = str_pad(FIPS, 5, pad = "0")) %>%
+              rename(IDC_econ_loss_natl = IDC_econ_loss,
+                     term_econ_loss_natl = terminated_econ_loss) %>%
+              select(FIPS, IDC_econ_loss_natl, term_econ_loss_natl) %>%
+              right_join(comp) 
+
+write.csv(comp_natl %>% select(FIPS, IDC_econ_loss_natl, term_econ_loss_natl), "output/comp_natlmult_IDC_FIPS.csv", row.names=FALSE)
+
+sum(comp_natl$IDC_econ_loss_natl, na.rm=TRUE)
+sum(comp_natl$term_econ_loss_natl, na.rm=TRUE)
+
+ggplot(comp_natl) +
+          geom_point(aes(x=IDC_econ_loss/10^6, y=IDC_econ_loss_natl/10^6))+
+          theme_classic()+
+          geom_abline(color="red", intercept=0, slope=1)+
+          ylab("Economic Loss with National Economic Multiplier ($M)")+
+          xlab("Economic Loss with State-Specific Economic Multiplier ($M)")
+
+ggsave("figs/supp-comp_natl.png", width=4, height=4, dpi=300)
+
+```
+
+```{r sect-sens}
+comp_sect <- read.csv("output/NIH_impact_county.csv")
+
+comp_sect <- read.csv("output/NIH_impact_county_narrow.csv") %>%
+              rename(narrow_IDC_econ_loss = IDC_econ_loss) %>%
+              select(FIPS, narrow_IDC_econ_loss) %>%
+              right_join(comp_sect)
+
+comp_sect <- read.csv("output/NIH_impact_county_broad.csv") %>%
+              rename(broad_IDC_econ_loss = IDC_econ_loss) %>%
+              select(FIPS, broad_IDC_econ_loss) %>%
+              right_join(comp_sect)
+
+filter(comp_sect, narrow_IDC_econ_loss == 0 & IDC_econ_loss > 0) %>% nrow()
+filter(comp_sect, broad_IDC_econ_loss == 0 & IDC_econ_loss > 0) %>% nrow()
+
+psect1 <-ggplot(comp_sect) +
+          geom_point(aes(x=IDC_econ_loss/10^6, y=broad_IDC_econ_loss/10^6), pch=1)+
+          theme_classic()+
+          geom_abline(color="red", intercept=0, slope=1)+
+          ylab("Economic Loss with Broad Sectoral Filtering ($M)")+
+          xlab("Economic Loss without Sectoral Filtering ($M)")+
+          ylim(c(0, max(c(comp_sect$IDC_econ_loss, comp_sect$broad_IDC_econ_loss))/10^6))+
+          xlim(c(0, max(c(comp_sect$IDC_econ_loss, comp_sect$broad_IDC_econ_loss))/10^6))
+
+
+psect2 <- ggplot(comp_sect) +
+          geom_point(aes(x=IDC_econ_loss/10^6, y=narrow_IDC_econ_loss/10^6), pch=1)+
+          theme_classic()+
+          geom_abline(color="red", intercept=0, slope=1)+
+          ylab("Economic Loss with Narrow Sectoral Filtering ($M)")+
+          xlab("Economic Loss without Sectoral Filtering ($M)")+
+          ylim(c(0, max(c(comp_sect$IDC_econ_loss, comp_sect$narrow_IDC_econ_loss))/10^6))+
+          xlim(c(0, max(c(comp_sect$IDC_econ_loss, comp_sect$narrow_IDC_econ_loss))/10^6))
+
+plot_grid(psect1, psect2)
+ggsave("figs/supp-comp_sect.png", width=8, height=4, dpi=300)
+```
+
+```{r 2022-sens}
+comp_22 <- read.csv("output/NIH_impact_county.csv")
+
+comp_22 <- read.csv("output/NIH_impact_county-22.csv") %>%
+              rename(IDC_econ_loss_22 = IDC_econ_loss) %>%
+              select(FIPS, IDC_econ_loss_22) %>%
+              right_join(comp_22) %>%
+              filter(! state_code %in% c("MI", "AK", "MS"))
+
+ggplot(comp_22) +
+          geom_point(aes(x=IDC_econ_loss/10^6, y=IDC_econ_loss_22/10^6), size=1, shape=1)+
+          theme_classic()+
+          geom_abline(color="red", intercept=0, slope=1)+
+          ylab("Economic Loss with 2022 Commuter Flows ($M)")+
+          xlab("Economic Loss with 2016 Commuter Flows ($M)")
+
+ggsave("figs/supp-comp_22.png", width=4, height=4, dpi=300)
+
+```
