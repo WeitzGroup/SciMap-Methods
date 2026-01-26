@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 "0","#calculate estimated economic impact, using a 2.56 multiplier (from a 2025 NIH report)"
 "0","econ_multiplier <- 2.56"
 "0",""
@@ -33,3 +34,8 @@
 "0","#save out long form data with FIPS codes"
 "0","write.csv(NIH_clean_fips, ""./output/NIH_clean_fips.csv"", row.names=F)"
 "0",""
+=======
+version https://git-lfs.github.com/spec/v1
+oid sha256:cffc64a9063b04c7fb15ab4fa11bd091bc0c4ab76b8b91062d9cb1005f6f2c51
+size 2209
+>>>>>>> origin/main

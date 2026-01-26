@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 FIPS,state,county,pop_2024
 01000,Alabama,Alabama,5157699
 01001,Alabama,Autauga County,61464
@@ -3201,3 +3202,8 @@ FIPS,state,county,pop_2024
 09011,Connecticut,New London County,
 09013,Connecticut,Tolland County,
 09015,Connecticut,Windham County,
+=======
+version https://git-lfs.github.com/spec/v1
+oid sha256:b3a7433fef2791aa4349003d4ceef1a00d84d56e555875b8e330e28f7167ee10
+size 118781
+>>>>>>> origin/main

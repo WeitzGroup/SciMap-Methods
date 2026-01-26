@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 "0",""
 "0","#2024 NIH data"
 "0","NIH <- read.csv(""data/NIH_raw.csv"")"
@@ -28,3 +29,8 @@
 "0","NIH_clean$proj.num <- str_sub(NIH_clean$proj.num, 2)"
 "0",""
 "0",""
+=======
+version https://git-lfs.github.com/spec/v1
+oid sha256:7067bfa9c682397fc0d9625b7656bc9e6d62b8c52ac597b5faf9ec111da3bf47
+size 1461
+>>>>>>> origin/main

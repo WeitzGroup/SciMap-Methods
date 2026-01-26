@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 "0",""
 "0","# getting weird warning, verify all observations are included"
 "0","#bin_data <- ggplot_build(fig3c)data[[1]]"
@@ -17,3 +18,8 @@
 "0","#   select(ORIGIN, DESTINATION, econ_loss, econ_loss_county, proportion) "
 "0",""
 "0",""
+=======
+version https://git-lfs.github.com/spec/v1
+oid sha256:016d2b2059165889a71146ab6ca34fe958902cde7105cfcd87de2e96637845a5
+size 681
+>>>>>>> origin/main

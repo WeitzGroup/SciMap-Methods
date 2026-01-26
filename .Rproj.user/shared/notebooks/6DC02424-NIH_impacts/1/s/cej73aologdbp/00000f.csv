@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 "0","term_tab_orig <- read.csv(""data/nih_terminations_airtable - JAMA.csv"") %>%"
 "0","  mutate(award_remaining = as.numeric(str_replace(total_estimated_remaining, ""\\$"", """"))) %>%"
 "0","  mutate(org_name = toupper(org_name)) %>%"
@@ -71,3 +72,8 @@
 "0","# if there are more organizations added with missing coords, will need to relocate"
 "0","# using API call: https://geo.fcc.gov/api/census/block/find?latitude=lat&longitude=long&showall=true&format=json"
 "0","print(missing_coords)"
+=======
+version https://git-lfs.github.com/spec/v1
+oid sha256:8676092afcdba9ba8aa3adc07f45bf1fbd4a678fa27b5c9b833e32bbe8bd83ef
+size 4064
+>>>>>>> origin/main

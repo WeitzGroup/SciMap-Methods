@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 "0","term_tab %>%"
 "0","  select(""award_remaining"", ""award_remaining_noself"", ""FIPS"", ""state"", ""state_code"", ""org_name"") %>%"
 "0","  mutate(award_remaining = ifelse(award_remaining <0 , 0 , award_remaining),"
@@ -42,3 +43,8 @@ Please use a list of either functions or lambdas:
 "0","#write.csv(county_commute_NIH_inst, ""output/methods/county_commute_NIH_inst.csv"", row.names=FALSE)"
 "0",""
 "0","  "
+=======
+version https://git-lfs.github.com/spec/v1
+oid sha256:31a9670e51798d89d41bafb873c5941a59bd1408a197638e0de2d39bb9f4f70d
+size 2604
+>>>>>>> origin/main

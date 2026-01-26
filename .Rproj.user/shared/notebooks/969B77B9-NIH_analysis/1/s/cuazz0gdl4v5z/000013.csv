@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 "0","comp %>% filter(terminated_econ_loss >100000) %>% nrow()"
 "1","[1]"
 "1"," 1185"
@@ -19,3 +20,8 @@
 "1"," 0.6033898"
 "1","
 "
+=======
+version https://git-lfs.github.com/spec/v1
+oid sha256:08feac85016707e257f0be5b03c9d16aeabd6bdf15996667555bd3d01c30acc2
+size 508
+>>>>>>> origin/main

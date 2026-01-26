@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 "GEOID","IDC_econ_loss","static_IDC_loss","terminated_econ_loss","static_term_loss","pol_party"
 "0102",17020341.6479286,7320012.288,5575374.59480011,863848.6272,"Democrat"
 "0103",11897141.7838246,4344436.096,5250871.2620117,2665684.5312,"Republican"
@@ -435,3 +436,8 @@
 "5303",18697760.4637029,0,1568631.54794406,0,"Democrat"
 "5310",23870798.0765021,0,1911969.02788949,0,"Democrat"
 "5506",15838128.7383849,0,1667797.18780245,0,"Republican"
+=======
+version https://git-lfs.github.com/spec/v1
+oid sha256:bd214872e325e69846d876cbdac6d2160319764f495bbcf3126cb0b922bebe32
+size 31175
+>>>>>>> origin/main

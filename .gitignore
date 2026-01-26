@@ -1,16 +1,23 @@
 data/commuter-jt00.csv
-data/NIH_raw.csv
 data/commuter_data.xlsx
 commuters_2016.csv
 data/desktop.ini
-data/NIH_prior.csv
-NIH_analysis.Rmd
+<<<<<<< HEAD
+=======
 /figs
+>>>>>>> origin/main
 /paper
 NIH_IDC.Rmd
 NIH_terminated.Rmd
 .RDataTmp
 .RDataTmp1
 .Rhistory
-output/county_commute_NIH.csv
-output/county_commute_NIH.csv
+<<<<<<< HEAD
+data/NIH_prior.csv  
+data/NIH_raw.csv  
+data/OD_tract-to-county_2016.csv  
+output/county_commute_NIH.csv  
+output/county_commute_NIH_county2county.csv
+=======
+>>>>>>> origin/main
+

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 "State","Abbreviation"
 "Alabama","AL"
 "Alaska","AK"
@@ -50,3 +51,8 @@
 "West Virginia","WV"
 "Wisconsin","WI"
 "Wyoming","WY"
+=======
+version https://git-lfs.github.com/spec/v1
+oid sha256:f4ae0710bb956747d65ecf9e8297f875a7113b96dec505a77ec375a4dfbf568e
+size 925
+>>>>>>> origin/main

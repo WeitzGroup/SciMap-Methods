@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 "0","sum(comp$static_IDC_loss)"
 "1","[1]"
 "1"," 16611177192"
@@ -153,3 +154,8 @@
 "1","
 "
 "0","arrange(comp, desc(static_term_loss)) %>% select(FIPS, static_term_loss) %>% mutate(static_term_loss=static_term_loss/1000000000)"
+=======
+version https://git-lfs.github.com/spec/v1
+oid sha256:13138ed8b8b0ad3781698fe4500e05d58dfd14f305b997ee0f84aa3e59f124e0
+size 4182
+>>>>>>> origin/main

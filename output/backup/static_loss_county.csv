@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 "FIPS","IDC_loss","IDC_econ_loss","IDC_job_loss","grant_funds","grant_funds_econ","overlap_loss","overlap_econ_loss","overlap_job_loss","overlap_loss_noself","overlap_econ_loss_noself","overlap_job_loss_noself","terminated_econ_loss"
 "01073",46051955.5,117893006.08,508.296107055557,342986167,878044587.52,0,0,0,0,0,0,47131559.0912
 "01081",1697045.35,4344436.096,18.7310513861183,9492887,24301790.72,0,0,0,0,0,0,2665684.5312
@@ -441,3 +442,8 @@
 "72127",8867937,22701918.72,97.8794017707659,83822308,214585108.48,0,0,0,0,0,0,18046294.016
 "72139",120030,307276.8,1.32482499532248,810030,2073676.8,0,0,0,0,0,0,NA
 "78030",0,0,0,892546,2284917.76,0,0,0,0,0,0,41591.6544
+=======
+version https://git-lfs.github.com/spec/v1
+oid sha256:3465221ca426005bbdc52d238b669ab2ea65fe4cf5a654f6d1b0a6a8471c631b
+size 36477
+>>>>>>> origin/main

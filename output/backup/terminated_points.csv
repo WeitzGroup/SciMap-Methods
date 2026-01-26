@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 "org_name","lat","lon","terminated_loss","terminated_num","terminated_loss_noself","terminated_num_noself"
 "University of Texas Medical Branch Galveston",29.311028,-94.778007,44997610.67,6,44997610.67,6
 "University of Texas MD Anderson Cancer Center",29.706319,-95.397195,1183392.42,3,1183392.42,3
@@ -374,3 +375,8 @@
 "Rockefeller University",40.763746,-73.955386,52632.06,1,52632.06,1
 "New York Medical College",41.085531,-73.810253,67413.08,1,67413.08,1
 "State University of New York at Albany",42.691708,-73.825588,150910.56,1,150910.56,1
+=======
+version https://git-lfs.github.com/spec/v1
+oid sha256:7390c5f8738400063c805a7239ee143772951e9ed4db0eb162a4c972fe8f02c0
+size 29827
+>>>>>>> origin/main

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 "GEOID","IDC_loss","IDC_econ_loss","IDC_job_loss","grant_funds","grant_funds_econ","overlap_loss","overlap_econ_loss","overlap_job_loss","overlap_loss_noself","overlap_econ_loss_noself","overlap_job_loss_noself","terminated_econ_loss"
 "0102",2859379.8,7320012.288,31.5602585200382,14987461,38367900.16,0,0,0,0,0,0,863848.6272
 "0103",1697045.35,4344436.096,18.7310513861183,9492887,24301790.72,0,0,0,0,0,0,2665684.5312
@@ -379,3 +380,8 @@
 "6698",709721.2,1816886.272,7.8335115010436,4440312,11367198.72,0,0,0,0,0,0,NA
 "7298",13324503.3,34110728.448,147.068524719627,121590794,311272432.64,0,0,0,0,0,0,19302639.232
 "7898",0,0,0,892546,2284917.76,0,0,0,0,0,0,41591.6544
+=======
+version https://git-lfs.github.com/spec/v1
+oid sha256:47f134895e3ee93a89aa017e3a3cee47c05bc19b44f8cafb82a4b96625982347
+size 32958
+>>>>>>> origin/main

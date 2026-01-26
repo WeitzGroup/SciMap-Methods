@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 "0",""
 "0","log10pseudo_trans <- trans_new("
 "0","  ""log10pseudo"","
@@ -126,3 +127,8 @@
 "2","Warning: [38;5;252mRemoved 2 rows containing missing values or values outside the scale range (`geom_bar()`).[39m"
 "2","Warning: [38;5;252mAll aesthetics have length 1, but the data has 191 rows.
 [36mℹ[38;5;252m Please consider using `annotate()` or provide this layer with data containing a single row.[39m"
+=======
+version https://git-lfs.github.com/spec/v1
+oid sha256:074841e1d8f808884faf653cdd6774519b6d9a36a0cc4a7732b3a03c9d3d3907
+size 8861
+>>>>>>> origin/main

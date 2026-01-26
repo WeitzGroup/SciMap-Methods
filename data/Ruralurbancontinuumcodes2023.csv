@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 FIPS,State,County_Name,Attribute,Value
 01001,AL,Autauga County,Population_2020,58805
 01001,AL,Autauga County,RUCC_2023,2
@@ -9702,3 +9703,8 @@ FIPS,State,County_Name,Attribute,Value
 78030,VI,St. Thomas Island,Population_2020,42261
 78030,VI,St. Thomas Island,RUCC_2023,5
 78030,VI,St. Thomas Island,Description,"Nonmetro - Urban population of 20,000 or more, not adjacent to a metro area"
+=======
+version https://git-lfs.github.com/spec/v1
+oid sha256:ec455ee2a8bc5fc8e070575ea5bee7dce46fc6037f8c3449cbf56e8b45331fa7
+size 629322
+>>>>>>> origin/main

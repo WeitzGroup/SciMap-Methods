@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 "0","elections <- read.csv(""data/2024_US_County_Level_Presidential_Results.csv"") %>%"
 "0","                mutate(FIPS = str_pad(county_fips, 5, pad = ""0"")) %>%"
 "0","                mutate(partisan = ifelse(per_gop > per_dem, ""R"", ""D"")) %>%"
@@ -138,3 +139,8 @@
 "1","
 "
 "0","comp %>% arrange(desc(static_IDC_loss))"
+=======
+version https://git-lfs.github.com/spec/v1
+oid sha256:565d1585e81c9c2b440dd6484569ecbf22235e450beb879c919e66a2a009d8ac
+size 5366
+>>>>>>> origin/main

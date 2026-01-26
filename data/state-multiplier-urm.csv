@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 State,NIH AWARDS ($M),"Jobs Created per
 $1M NIH Awards",Intrastate Jobs,"Added Interstate (Jobs, %)",Interstate Jobs,,TOTAL EMPLOYMENT,ECONOMIC ACTIVITY ($M)
 Alabama,380.3,9.4,"3,594.20",22.7,816.8,,"4,411.00",915.9
@@ -52,3 +53,8 @@ West Virginia,54.1,8,433.3,62.6,271.2,,704.5,147.6
 Wisconsin,595.1,9.3,"5,546.90",20.8,"1,156.40",,"6,703.30","1,381.40"
 Wyoming,11.7,8.2,95.9,155.2,148.9,,244.8,47.6
 ,,,,,,,,
+=======
+version https://git-lfs.github.com/spec/v1
+oid sha256:b72c65ce9938faef03e8b434b7c9054d6bec196da82f738b2e41605198b4e76f
+size 3385
+>>>>>>> origin/main

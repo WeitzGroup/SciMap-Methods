@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 "0",""
 "0","#merge in FIPS codes (geolocated separately)"
 "0","NIH_fips <- read.csv(""./data/fips_dictionary.csv"") %>%"
@@ -22,3 +23,8 @@
 "0","#note that one row in the NIH_clean dataset did not have valid lat/long coordinates, so these grants are excluded from county-level summaries."
 "0",""
 "0",""
+=======
+version https://git-lfs.github.com/spec/v1
+oid sha256:f337a18ae2396511710b83da1409755b5c22fbb800543e2c08cde9e92790f653
+size 1114
+>>>>>>> origin/main

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 "0","NIH_clean_fips <- read.csv(file=""output/methods/NIH_clean_fips.csv"")"
 "0",""
 "0","NIH_clean_fips %>% "
@@ -17,3 +18,8 @@
 "0","  write.csv(""figs/fig1-vals.csv"", row.names=FALSE)"
 "0","  "
 "0",""
+=======
+version https://git-lfs.github.com/spec/v1
+oid sha256:10f8a87cf571fd1b1b940f22bce3857b422f2dabd07676270eb581dddc572733
+size 1059
+>>>>>>> origin/main

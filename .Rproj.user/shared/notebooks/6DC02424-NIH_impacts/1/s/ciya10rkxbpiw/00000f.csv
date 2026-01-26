@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 "0","# commute is a dataframe derived from 2022 Census data with the following columns"
 "0","# ORIGIN: is the FIPS code for the county of residence"
 "0","# DESTINATION: is the FIPS code for the county of work"
@@ -30,3 +31,8 @@
 "1"," 0"
 "1","
 "
+=======
+version https://git-lfs.github.com/spec/v1
+oid sha256:d184a65a2b43256509174b85af53b458dffc0f89048bb533e704676294c44ee5
+size 1507
+>>>>>>> origin/main

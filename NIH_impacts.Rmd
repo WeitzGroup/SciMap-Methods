@@ -18,6 +18,7 @@ library(tidyverse)
 library(readxl)
 library(sf)
 library(magrittr)
+library(data.table)
 
 options(scipen=999)
 
@@ -56,21 +57,22 @@ NIH_clean$proj.num <- str_sub(NIH_clean$proj.num, 2)
 ```
 
 ```{r Get FIPS Codes}
-
 #merge in FIPS codes (geolocated separately)
-NIH_fips <- read.csv("data/fips_dictionary.csv") %>%
-            distinct() %>%
-            mutate(FIPS = str_pad(FIPS, 5, pad = "0")) %>%
+NIH_tract_fips <- read.csv("data/tract_dictionary.csv") %>%
+            mutate(tractid = str_pad(tractid, 11, pad = "0")) %>%
+            mutate(FIPS = substr(tractid, 0, 5)) %>%
             filter(lat!=0 & !is.na(FIPS)) %>%
-            distinct()
+            select(tractid, FIPS, lat, lon) %>%
+            distinct() 
 
 NIH_geoid <- read.csv("data/geoid_dictionary_July4.csv") %>%
             select(-GEOID) %>%
             mutate(GEOID = str_pad(New119Fips, 4, pad = "0")) %>%
             filter(lat!=0 & !is.na(GEOID)) %>%
+            select(GEOID, NAMELSAD, lat, lon) %>%
             distinct()
 
-NIH_clean_fips <- left_join(NIH_clean, NIH_fips) %>%
+NIH_clean_fips <- left_join(NIH_clean, NIH_tract_fips) %>%
                     left_join(NIH_geoid)
 
 NIH_clean_fips <- filter(NIH_clean_fips, !is.na(FIPS))
@@ -78,7 +80,7 @@ NIH_clean_fips <- filter(NIH_clean_fips, !is.na(FIPS))
 ```
 
 ```{r terminated grants}
-term_tab_orig <- read.csv("data/nih_terminations_airtable.csv") %>%
+term_tab_orig <- read.csv("data/nih_terminations.csv") %>%
   mutate(award_remaining = as.numeric(str_replace(total_estimated_remaining, "\\$", ""))) %>%
   mutate(org_name = toupper(org_name)) %>%
   mutate(award_remaining_noself = ifelse(cancellation_source == "Self reported", 0 , award_remaining)) %>%
@@ -102,7 +104,7 @@ loc_tab <- NIH_clean_fips %>%
   mutate(org_name = toupper(org_name)) %>%
   mutate(lat = as.numeric(lat),
          lon = as.numeric(lon)) %>%
-  select(org_name, lat, lon, FIPS) %>%
+  select(org_name, lat, lon, FIPS, tractid) %>%
   distinct() %>%
   filter(!is.na(org_name))
 
@@ -112,7 +114,7 @@ loc_tab <-read.csv("data/geoid_dictionary_July4.csv") %>%
             select(lat, lon, GEOID) %>%
             distinct() %>%
             left_join(loc_tab) %>%
-            select(org_name, lat, lon, GEOID, FIPS) %>%
+            select(org_name, lat, lon, GEOID, FIPS, tractid) %>%
             filter(!is.na(org_name))
 
 loc_tab$org_name[loc_tab$org_name=="UNIVERSITY OF COLORADO" & loc_tab$GEOID == "0805"] <- "UNIVERSITY OF COLORADO - COLORADO SPRINGS"
@@ -140,21 +142,26 @@ missing_coords <- read.csv("data/NIH_prior.csv") %>%
 
 # if there are more organizations added with missing coords, will need to relocate
 # using API call: https://geo.fcc.gov/api/census/block/find?latitude=lat&longitude=long&showall=true&format=json
+
+
 missing_fips <- data.frame(org_name =  c("ECOHEALTH ALLIANCE, INC.",
-                                         "FUNCTION PROMOTING THERAPIES, LLC",
+                                         #"FUNCTION PROMOTING THERAPIES, LLC",
                                          "BENTLEY UNIVERSITY",
                                          "RESILIENT GAMES STUDIO, LLC",
                                          "HEBREW HOME FOR THE AGED AT RIVERDALE",
                                          "NEW YORK UNIVERSITY D/B/A NYU LONG ISLAND SCHOOL OF MEDICINE",
-                                         "PRIOGEN CORP"),
-                           FIPS = c("36061", "25025", "25017", "17031", "36005", "36059", "27123"),
-                           GEOID = c("3612", "2507", "2505", "1701", "3615", "3603", "2704")) %>%
+                                         "FAMILIES AGAINST NARCOTICS, INC. D/B/A FACE ADDICTION NOW"),
+                                         #"PRIOGEN CORP"),
+                           FIPS = c("36061", "25017", "17031", "36005", "36059", "26099"),
+                           GEOID = c("3612", "2505", "1701", "3615", "3603", "2610"),
+                           tractid = c("36061010300","25017369000","17031410600","36005030900", "36059303600", "26099242500")
+                           ) %>%
                 right_join(missing_coords)
 
 missing_coords$lat[missing_coords$org_name=="NEW YORK UNIVERSITY D/B/A NYU LONG ISLAND SCHOOL OF MEDICINE"]<-40.741556066276
 missing_coords$lon[missing_coords$org_name=="NEW YORK UNIVERSITY D/B/A NYU LONG ISLAND SCHOOL OF MEDICINE"]<--73.640354915859
-missing_coords$lat[missing_coords$org_name=="PRIOGEN CORP"]<-44.970078873271
-missing_coords$lon[missing_coords$org_name=="PRIOGEN CORP"]<--93.205053683411
+missing_coords$lat[missing_coords$org_name=="FAMILIES AGAINST NARCOTICS, INC. D/B/A FACE ADDICTION NOW"]<-42.6191401
+missing_coords$lon[missing_coords$org_name=="FAMILIES AGAINST NARCOTICS, INC. D/B/A FACE ADDICTION NOW"]<--82.9550412
 
 
 loc_tab %<>% rbind(missing_fips)
@@ -227,30 +234,43 @@ sum(term_points$terminated_loss)
 ```
 
 ```{r Calculate Losses}
-#calculate estimated economic impact, using a 2.56 multiplier (from a 2025 NIH report)
-econ_multiplier <- 2.56
+# state-specific multipliers: read in 
+state_mult <- read.csv("data/state-multiplier-urm.csv") %>% 
+                rename(tot_fund = 2, 
+                       econ_act = 9,
+                       state.name= 1,
+                       jobs_per_m = 3) %>%
+                mutate(econ_act = as.numeric(gsub(",", "", econ_act)),
+                       tot_fund = as.numeric(gsub(",", "", tot_fund)),
+                       job_val = as.numeric(gsub(",", "", jobs_per_m))/1000000) %>%
+                mutate(econ_mult = econ_act/tot_fund) %>%
+                select(state.name, econ_mult, job_val) %>%
+                left_join(data.frame(state.name=state.name,
+                                     state=state.abb)) %>%
+                select(-state.name) %>%
+                filter(!is.na(state))
 
-#estimated jobs lost - multiplier
-job_value <- (94580000000/2.56/407782) #total NIH economic impact in 2024 / 2.56 / total jobs supported by NIH funding
-
+# use state-specific multipliers
+NIH_clean_fips %<>%
+  left_join(state_mult)
+                        
 #if a 15% indirect cost rate max is imposed, this would be the loss
 NIH_clean_fips$IDC_loss <- NIH_clean_fips$indirect - .15 * NIH_clean_fips$direct
 
 #set negative values to zero; these are cases where there were no indirects before, or the IDC rate was <15% already
 NIH_clean_fips$IDC_loss <- ifelse(NIH_clean_fips$IDC_loss < 0, 0, NIH_clean_fips$IDC_loss) 
 
-#calculate estimated economic impact, using a 2.56 multiplier (from a 2025 NIH report)
-NIH_clean_fips$grant_funds_econ <- NIH_clean_fips$grant_funds * econ_multiplier #status quo; economic activity resulting from grants active in 2024
+#calculate estimated economic impact, using a state-specific multiplier (from a 2025 NIH report)
+NIH_clean_fips$grant_funds_econ <- NIH_clean_fips$grant_funds * NIH_clean_fips$econ_mult #status quo; economic activity resulting from grants active in 2024
 
-NIH_clean_fips$IDC_econ_loss <- NIH_clean_fips$IDC_loss * econ_multiplier #projected losses with 15% IDC
+NIH_clean_fips$IDC_econ_loss <- NIH_clean_fips$IDC_loss * NIH_clean_fips$econ_mult #projected losses with 15% IDC
 
-NIH_clean_fips$IDC_job_loss <- NIH_clean_fips$IDC_loss/job_value
+NIH_clean_fips$IDC_job_loss <- NIH_clean_fips$IDC_loss*NIH_clean_fips$job_val
 
 # identify overlap between terminated grants and potential IDC loss (will use this to calculate total losses without repetition)
 term_tab_noself <- term_tab %>% filter(cancellation_source != "Self reported")
 
 term_tab$full_award_number <-  substring(term_tab$full_award_number, 2)
-
 
 NIH_clean_fips %<>%
   mutate(
@@ -260,7 +280,8 @@ NIH_clean_fips %<>%
     overlap_loss_noself = ifelse(proj.num %in% term_tab_noself$full_award_number, IDC_loss, 0),
     overlap_econ_loss_noself = ifelse(proj.num %in% term_tab_noself$full_award_number, IDC_econ_loss, 0),
     overlap_job_loss_noself = ifelse(proj.num %in% term_tab_noself$full_award_number, IDC_job_loss, 0)
-  ) 
+  ) %>%
+  select(-econ_mult)
 
 #save out long form data with FIPS codes
 write.csv(NIH_clean_fips, "./output/NIH_clean_fips.csv", row.names=F)
@@ -274,21 +295,21 @@ write.csv(NIH_clean_fips, "./output/NIH_clean_fips.csv", row.names=F)
 # COMMUTES: is the number of workers commuting from the specific ORIGIN to DESTINATION
 
 # IMPORTANT: some FIPS codes have leading zeros
-commute_raw <- read.csv("./data/OD_countySum001_2016.csv") %>%
-  mutate(ORIGIN = str_pad(ORIGIN, 5, pad = "0"),
-         DESTINATION = str_pad(DESTINATION, 5, pad = "0"))
+commute_raw <- fread("./data/OD_tract-to-county_2016.csv") %>% 
+  mutate(DESTINATION = str_pad(W_geocode, 11, pad = "0"),
+         ORIGIN = str_pad(H_geocode, 5, pad = "0"))
 
 # calculate proportion weights
 commute <- commute_raw %>% 
   # calculate the total number of workers who work in a given county
   group_by(DESTINATION) %>%
-  summarize(DESTINATION_total_workers = sum(COMMUTES)) %>%
+  summarize(DESTINATION_total_workers = sum(Commuters)) %>%
   # join this back to the full commuter dataframe
   left_join(commute_raw) %>%
   # for each ORIGIN - DESTINATION pair, calculate proportion as the number
   # of workers from ORIGIN who work in DESTINATION divided by the total 
   # number of people who work in DESTINATION
-  mutate(proportion = COMMUTES/DESTINATION_total_workers)
+  mutate(proportion = Commuters/DESTINATION_total_workers)
 
 # Quality check: all destination weights should sum to 1
 commute %>% 
@@ -302,22 +323,29 @@ commute %>%
 
 
 ```{r County Calculations}
-
 term_tab %>%
-  select("award_remaining", "award_remaining_noself", "FIPS", "state", "state_code") %>%
+  select("award_remaining", "award_remaining_noself", "FIPS", "state", "state_code", "tractid") %>%
+  left_join(state_mult %>% rename(state_code = state)) %>%
   mutate(award_remaining = ifelse(award_remaining <0 , 0 , award_remaining),
          award_remaining_noself = ifelse(award_remaining_noself <0 , 0 , award_remaining_noself)) %>%
   rename(terminated_loss = award_remaining,
          terminated_loss_noself = award_remaining_noself) %>%
-  mutate(terminated_econ_loss = terminated_loss * econ_multiplier,
-         terminated_job_loss = terminated_loss/job_value,
-         terminated_econ_loss_noself = terminated_loss_noself * econ_multiplier,
-         terminated_job_loss_noself = terminated_loss_noself/job_value) %>%
+  mutate(terminated_econ_loss = terminated_loss * econ_mult,
+         terminated_job_loss = terminated_loss*job_val,
+         terminated_econ_loss_noself = terminated_loss_noself * econ_mult,
+         terminated_job_loss_noself = terminated_loss_noself*job_val) %>%
+  group_by(tractid, FIPS) %>%
+  summarise(across(starts_with(c("terminated")), ~ sum(.x, na.rm = TRUE))) -> term_sum_tract
+
+term_sum_tract %>%
   group_by(FIPS) %>%
   summarise(across(starts_with(c("terminated")), ~ sum(.x, na.rm = TRUE))) -> term_sum_FIPS
 
+#summarize NIH data by tract id and FIPS code
+NIH_sum_tract <- NIH_clean_fips %>% 
+  group_by(tractid) %>% 
+  summarise(across(starts_with(c("IDC", "grant", "overlap")), ~ sum(.x, na.rm = TRUE))) 
 
-#summarize NIH data by FIPS code
 NIH_sum_FIPS <- NIH_clean_fips %>% 
   group_by(FIPS) %>% 
   summarise(across(starts_with(c("IDC", "grant", "overlap")), ~ sum(.x, na.rm = TRUE))) 
@@ -327,8 +355,8 @@ NIH_sum_FIPS %>% merge(term_sum_FIPS %>% select(FIPS, terminated_econ_loss), all
 write.csv("output/static_loss_county.csv", row.names=FALSE)
 
 #combine commuter data with NIH data
-county_commute_NIH <- merge(commute, term_sum_FIPS, by.x = "DESTINATION", by.y = "FIPS", all.x = TRUE) %>%
-                  merge(NIH_sum_FIPS, by.x = "DESTINATION", by.y = "FIPS", all.x = TRUE)
+county_commute_NIH <- merge(commute, term_sum_tract %>% select(-FIPS), by.x = "DESTINATION", by.y = "tractid", all.x = TRUE) %>%
+                  merge(NIH_sum_tract, by.x = "DESTINATION", by.y = "tractid", all.x = TRUE)
 
 #replace all NA values with zeros
 county_commute_NIH <- mutate_all(county_commute_NIH , funs(replace(., is.na(.), 0)))
@@ -371,18 +399,40 @@ county_commute_NIH_sum <- read.csv("data/state_abbrev.csv") %>%
          state = State) %>%
   left_join(state_dict) %>%
   right_join(county_commute_NIH_sum) %>%
-  select(-state_FIPS)
+  select(-state_FIPS) %>%
+  filter(FIPS != "0")
 
 print(nrow(county_commute_NIH_sum))
 sum(is.na(county_commute_NIH_sum$state_code))
 
 write.csv(county_commute_NIH_sum, "output/NIH_impact_county.csv", row.names=FALSE)
 ```
+```{r institution level calculations}
+NIH_clean_fips %>%
+  group_by(org_name, tractid) %>%
+  summarize(across(starts_with("IDC"), ~ sum(., na.rm=TRUE)))-> IDC_inst
+
+#combine commuter data with NIH data
+county_commute_NIH_inst <- merge(commute, IDC_inst, by.x = "DESTINATION", by.y = "tractid", all.x = TRUE) 
+
+#replace all NA values with zeros
+county_commute_NIH_inst <- mutate_all(county_commute_NIH_inst , funs(replace(., is.na(.), 0))) %>%
+  mutate(across(starts_with(c("IDC")), ~ . * proportion)) %>%
+  rename(FIPS = ORIGIN) %>%
+  group_by(FIPS) %>%
+  group_by(FIPS, org_name) %>% 
+  summarize(across(starts_with(c("IDC")), ~ sum(., na.rm=TRUE))) %>%
+  slice_max(IDC_econ_loss, n=5)
+
+write.csv(county_commute_NIH_inst, "output/county_commute_NIH_inst.csv", row.names=FALSE)
+  
+```
+
 ```{r county-stayvflow}
 #how much we assume stays in county - no commuting
 county_varystatic <- map_df(seq(0, 1, by = 0.05), function(mult) {
   county_commute_NIH %>%
-    mutate(proportion = ifelse(ORIGIN == DESTINATION, mult + (1 - mult) * proportion, (1 - mult) * proportion)) %>%
+    mutate(proportion = ifelse(ORIGIN == substr(DESTINATION, 1, 5), mult + (1 - mult) * proportion, (1 - mult) * proportion)) %>%
     mutate(across(starts_with(c("terminated", "IDC", "grant", "overlap")), ~ . * proportion)) %>%
     rename(FIPS = ORIGIN) %>%
     group_by(FIPS) %>% 
@@ -398,24 +448,60 @@ write.csv(county_varystatic, "output/NIH_impact_county-sens.csv", row.names=FALS
 
 ```
 
-```{r county-sensitivity}
-state_mult <- read.csv("data/state-multiplier-urm.csv") %>% 
-                rename(tot_fund = 2, 
-                       econ_act = 9,
-                       state= 1) %>%
-                mutate(econ_act = as.numeric(gsub(",", "", econ_act)),
-                       tot_fund = as.numeric(gsub(",", "", tot_fund))) %>%
-                mutate(econ_mult = econ_act/tot_fund) %>%
-                select(state, econ_mult)
 
-# use state-specific multipliers
-county_commute_NIH_diffmult <- read.csv("data/county_pop.csv") %>%
-                        mutate(FIPS = str_pad(FIPS, 5, pad = "0")) %>%
-                        right_join(county_commute_NIH %>% mutate(FIPS = DESTINATION)) %>%
-                        left_join(state_mult) %>%
-                        mutate(terminated_econ_loss = terminated_loss * econ_mult,
-                               IDC_econ_loss = IDC_loss * econ_mult) %>%
-                        select(-FIPS)
+```{r county_county-sens}
+
+commute_raw_ctc <- fread("./data/OD_tract-to-county_2016.csv") %>% 
+  mutate(DESTINATION = str_pad(W_geocode, 11, pad = "0"),
+         ORIGIN = str_pad(H_geocode, 5, pad = "0")) %>%
+  mutate(DESTINATION = substr(1, 5, DESTINATION))
+
+# calculate proportion weights
+commute_ctc <- commute_raw_ctc %>% 
+  # calculate the total number of workers who work in a given county
+  group_by(DESTINATION) %>%
+  summarize(DESTINATION_total_workers = sum(Commuters)) %>%
+  # join this back to the full commuter dataframe
+  left_join(commute_raw_ctc) %>%
+  # for each ORIGIN - DESTINATION pair, calculate proportion as the number
+  # of workers from ORIGIN who work in DESTINATION divided by the total 
+  # number of people who work in DESTINATION
+  mutate(proportion = Commuters/DESTINATION_total_workers)
+
+#combine commuter data with NIH data
+county_commute_NIH_ctc <- merge(commute_ctc, term_sum_FIPS, by.x = "DESTINATION", by.y = "FIPS", all.x = TRUE) %>%
+                  merge(NIH_sum_FIPS, by.x = "DESTINATION", by.y = "FIPS", all.x = TRUE)
+
+#replace all NA values with zeros
+
+county_commute_NIH_ctc_sum <- county_commute_NIH_ctc %>%
+  mutate(across(starts_with(c("terminated", "IDC", "grant", "overlap")), ~ . * proportion)) %>%
+  rename(FIPS = ORIGIN) %>%
+  group_by(FIPS) %>% 
+  summarise(across(starts_with(c("terminated", "IDC", "grant", "overlap")), ~ sum(.x, na.rm = TRUE))) %>%
+  mutate(state_FIPS =  substr(FIPS, 1, 2)) %>%
+  # calculate total as terminated + IDC - overlap
+  mutate(combined_loss = terminated_loss + IDC_loss - overlap_loss,
+         combined_econ_loss = terminated_econ_loss + IDC_econ_loss - overlap_econ_loss,
+         combined_job_loss = terminated_job_loss + IDC_job_loss - overlap_job_loss,
+         combined_loss_noself = terminated_loss_noself + IDC_loss - overlap_loss_noself,
+         combined_econ_loss = terminated_econ_loss_noself + IDC_econ_loss - overlap_econ_loss_noself,
+         combined_job_loss = terminated_job_loss_noself + IDC_job_loss - overlap_job_loss_noself) %>%
+  mutate(across(starts_with(c("terminated", "IDC", "grant", "combined")), ~ log(.x + 1), .names =  "{.col}_log"))
+
+write.csv(county_commute_NIH_ctc_sum, "output/NIH_impact_county-ctc.csv", row.names=FALSE)
+
+
+```
+
+
+```{r natl-mult-sensitivity}
+# use national multipliers
+county_commute_NIH_diffmult <- county_commute_NIH %>% 
+  mutate(terminated_econ_loss = terminated_loss * 2.56,
+         IDC_econ_loss = IDC_loss * 2.56,
+         overlap_econ_loss = overlap_loss * 2.56,
+         overlap_econ_loss_noself = overlap_loss_noself * 2.56) 
                         
 diff_mult_county <-  county_commute_NIH_diffmult %>%
   mutate(across(starts_with(c("terminated", "IDC", "grant", "overlap")), ~ . * proportion)) %>%
@@ -435,16 +521,203 @@ diff_mult_county <-  county_commute_NIH_diffmult %>%
 print(nrow(diff_mult_county))
 sum(is.na(diff_mult_county$state_code))
 
-write.csv(diff_mult_county, "output/NIH_impact_county-diffmult.csv", row.names=FALSE)
+write.csv(diff_mult_county, "output/NIH_impact_county-natlmult.csv", row.names=FALSE)
+
+```
+
+
+```{r 2022-flows}
+commute_raw_22 <- fread("./data/home_county_workTR_2022.csv") %>% 
+  mutate(DESTINATION = str_pad(work_tract, 11, pad = "0"),
+         ORIGIN = str_pad(home_county, 5, pad = "0"))
+
+# calculate proportion weights
+commute_22 <- commute_raw_22 %>% 
+  # calculate the total number of workers who work in a given county
+  group_by(DESTINATION) %>%
+  summarize(DESTINATION_total_workers = sum(commutes)) %>%
+  # join this back to the full commuter dataframe
+  left_join(commute_raw_22) %>%
+  # for each ORIGIN - DESTINATION pair, calculate proportion as the number
+  # of workers from ORIGIN who work in DESTINATION divided by the total 
+  # number of people who work in DESTINATION
+  mutate(proportion = commutes/DESTINATION_total_workers)
+
+#combine commuter data with NIH data
+county_commute_NIH_22 <- merge(commute_22, term_sum_tract %>% select(-FIPS), by.x = "DESTINATION", by.y = "tractid", all.x = TRUE) %>%
+                  merge(NIH_sum_tract, by.x = "DESTINATION", by.y = "tractid", all.x = TRUE)
+
+#replace all NA values with zeros
+county_commute_NIH_22 <- mutate_all(county_commute_NIH_22 , funs(replace(., is.na(.), 0)))
+
+county_commute_NIH_sum_22 <- county_commute_NIH_22 %>%
+  mutate(across(starts_with(c("terminated", "IDC", "grant", "overlap")), ~ . * proportion)) %>%
+  rename(FIPS = ORIGIN) %>%
+  group_by(FIPS) %>% 
+  summarise(across(starts_with(c("terminated", "IDC", "grant", "overlap")), ~ sum(.x, na.rm = TRUE))) %>%
+  mutate(state_FIPS =  substr(FIPS, 1, 2)) %>%
+  # calculate total as terminated + IDC - overlap
+  mutate(combined_loss = terminated_loss + IDC_loss - overlap_loss,
+         combined_econ_loss = terminated_econ_loss + IDC_econ_loss - overlap_econ_loss,
+         combined_job_loss = terminated_job_loss + IDC_job_loss - overlap_job_loss,
+         combined_loss_noself = terminated_loss_noself + IDC_loss - overlap_loss_noself,
+         combined_econ_loss = terminated_econ_loss_noself + IDC_econ_loss - overlap_econ_loss_noself,
+         combined_job_loss = terminated_job_loss_noself + IDC_job_loss - overlap_job_loss_noself) %>%
+  mutate(across(starts_with(c("terminated", "IDC", "grant", "combined")), ~ log(.x + 1), .names =  "{.col}_log"))
+
+
+#add state name
+county_commute_NIH_sum_22 <- read.csv("data/county_pop.csv") %>%
+                      mutate(FIPS = str_pad(FIPS, 5, pad = "0")) %>%
+                      right_join(county_commute_NIH_sum_22) 
+
+county_commute_NIH_sum_22 <- read.csv("data/state_abbrev.csv") %>%
+  rename(state_code = Abbreviation,
+         state = State) %>%
+  left_join(state_dict) %>%
+  right_join(county_commute_NIH_sum_22) %>%
+  select(-state_FIPS) %>%
+  filter(FIPS != "0") 
+
+write.csv(county_commute_NIH_sum_22, "output/NIH_impact_county-22.csv", row.names=FALSE)
+```
+
+```{r rac-wac-output}
+# calculate the proportion of residents in relevant sectors
+rac_df <- read.csv("data/RAC_countyAll.csv" ) %>% 
+          mutate(ORIGIN = str_pad(HomeCounty, 5, pad = "0")) %>%
+          mutate(broad_sum_rac = sum.CNS03.+sum.CNS04.+sum.CNS05.+sum.CNS07.+
+                             sum.CNS08.+sum.CNS12.+sum.CNS13.+sum.CNS14.+
+                             sum.CNS16.,
+                 narrow_sum_rac = sum.CNS12.+sum.CNS13.+sum.CNS14.+sum.CNS16.) %>%
+          mutate(broad_prop_rac = broad_sum_rac/AllCommutes,
+                 narrow_prop_rac = narrow_sum_rac/AllCommutes) %>%
+          mutate(broad_prop_rac = ifelse(is.infinite(broad_prop_rac), 0, broad_prop_rac),
+               narrow_prop_rac = ifelse(is.infinite(narrow_prop_rac), 0, narrow_prop_rac)) %>%
+          select(ORIGIN, broad_prop_rac, narrow_prop_rac)
+
+ 
+# calculate proportion of workers in relevant sectors
+wac_df <- read.csv("data/WAC_tractAll.csv" ) %>% 
+          mutate(DESTINATION = str_pad(WorkTract, 11, pad = "0")) %>%
+          mutate(broad_sum_wac = sum.CNS03.+sum.CNS04.+sum.CNS05.+sum.CNS07.+
+                             sum.CNS08.+sum.CNS12.+sum.CNS13.+sum.CNS14.+
+                             sum.CNS16.,
+                 narrow_sum_wac = sum.CNS12.+sum.CNS13.+sum.CNS14.+sum.CNS16.) %>%
+          mutate(broad_prop_wac = broad_sum_wac/AllCommutes,
+                 narrow_prop_wac = narrow_sum_wac/AllCommutes) %>%
+          mutate(broad_prop_wac = ifelse(is.infinite(broad_prop_wac), 0, broad_prop_wac),
+                 narrow_prop_wac = ifelse(is.infinite(narrow_prop_wac), 0, narrow_prop_wac)) %>%
+          select(DESTINATION, broad_prop_wac, narrow_prop_wac)
+
+# join rac and wac files to commuter flow
+commute_raw_sect <- fread("./data/OD_tract-to-county_2016.csv") %>% 
+  mutate(DESTINATION = str_pad(W_geocode, 11, pad = "0"),
+         ORIGIN = str_pad(H_geocode, 5, pad = "0")) %>%
+  select(DESTINATION, ORIGIN, Commuters) %>%
+  left_join(rac_df) %>%
+  left_join(wac_df) %>%
+  # calculate geometric mean of rac and wac 
+  mutate(broad_prop = sqrt(broad_prop_wac*broad_prop_rac),
+         narrow_prop = sqrt(narrow_prop_wac*narrow_prop_rac)) %>%
+  # rescale commuters 
+  select(-c(broad_prop_wac, narrow_prop_wac, broad_prop_rac, narrow_prop_rac)) %>%
+  mutate(broad_commuters = broad_prop * Commuters,
+         narrow_commuters = narrow_prop * Commuters) 
+  
+# calculate proportion weights
+commute_sect <- commute_raw_sect %>% 
+  # calculate the total number of workers who work in a given county
+  group_by(DESTINATION) %>%
+  summarize(DESTINATION_total_workers_broad = sum(broad_commuters, na.rm=TRUE),
+            DESTINATION_total_workers_narrow = sum(narrow_commuters, na.rm=TRUE)) %>%
+  # join this back to the full commuter dataframe
+  left_join(commute_raw_sect) %>%
+  # for each ORIGIN - DESTINATION pair, calculate proportion as the number
+  # of workers from ORIGIN who work in DESTINATION divided by the total 
+  # number of people who work in DESTINATION
+  mutate(proportion_broad = broad_commuters/DESTINATION_total_workers_broad,
+         proportion_narrow = narrow_commuters/DESTINATION_total_workers_narrow)
+
+#combine commuter data with NIH data
+county_commute_NIH_sect <- merge(commute_sect, term_sum_tract, by.x = "DESTINATION", by.y = "tractid", all.x = TRUE) %>%
+                  merge(NIH_sum_tract, by.x = "DESTINATION", by.y = "tractid", all.x = TRUE)
+
+#replace all NA values with zeros
+county_commute_NIH_sect <- mutate_all(county_commute_NIH_sect , funs(replace(., is.na(.), 0)))
+
+county_commute_NIH_sum_broad <- county_commute_NIH_sect %>%
+  select(-FIPS) %>%
+  mutate(across(starts_with(c("terminated", "IDC", "grant", "overlap")), ~ . * proportion_broad)) %>%
+  rename(FIPS = ORIGIN) %>%
+  group_by(FIPS) %>% 
+  summarise(across(starts_with(c("terminated", "IDC", "grant", "overlap")), ~ sum(.x, na.rm = TRUE))) %>%
+  mutate(state_FIPS =  substr(FIPS, 1, 2)) %>%
+  # calculate total as terminated + IDC - overlap
+  mutate(combined_loss = terminated_loss + IDC_loss - overlap_loss,
+         combined_econ_loss = terminated_econ_loss + IDC_econ_loss - overlap_econ_loss,
+         combined_job_loss = terminated_job_loss + IDC_job_loss - overlap_job_loss,
+         combined_loss_noself = terminated_loss_noself + IDC_loss - overlap_loss_noself,
+         combined_econ_loss = terminated_econ_loss_noself + IDC_econ_loss - overlap_econ_loss_noself,
+         combined_job_loss = terminated_job_loss_noself + IDC_job_loss - overlap_job_loss_noself) %>%
+  mutate(across(starts_with(c("terminated", "IDC", "grant", "combined")), ~ log(.x + 1), .names =  "{.col}_log"))
+
+#add state name
+county_commute_NIH_sum_broad <- read.csv("data/county_pop.csv") %>%
+                      mutate(FIPS = str_pad(FIPS, 5, pad = "0")) %>%
+                      right_join(county_commute_NIH_sum_broad) 
+
+county_commute_NIH_sum_broad <- read.csv("data/state_abbrev.csv") %>%
+  rename(state_code = Abbreviation,
+         state = State) %>%
+  left_join(state_dict) %>%
+  right_join(county_commute_NIH_sum_broad) %>%
+  select(-state_FIPS) %>%
+  filter(FIPS != "0")
+
+write.csv(county_commute_NIH_sum_broad, "output/NIH_impact_county_broad.csv", row.names=FALSE)
+
+county_commute_NIH_sum_narrow <- county_commute_NIH_sect %>%
+  select(-FIPS) %>%
+  mutate(across(starts_with(c("terminated", "IDC", "grant", "overlap")), ~ . * proportion_narrow)) %>%
+  rename(FIPS = ORIGIN) %>%
+  group_by(FIPS) %>% 
+  summarise(across(starts_with(c("terminated", "IDC", "grant", "overlap")), ~ sum(.x, na.rm = TRUE))) %>%
+  mutate(state_FIPS =  substr(FIPS, 1, 2)) %>%
+  # calculate total as terminated + IDC - overlap
+  mutate(combined_loss = terminated_loss + IDC_loss - overlap_loss,
+         combined_econ_loss = terminated_econ_loss + IDC_econ_loss - overlap_econ_loss,
+         combined_job_loss = terminated_job_loss + IDC_job_loss - overlap_job_loss,
+         combined_loss_noself = terminated_loss_noself + IDC_loss - overlap_loss_noself,
+         combined_econ_loss = terminated_econ_loss_noself + IDC_econ_loss - overlap_econ_loss_noself,
+         combined_job_loss = terminated_job_loss_noself + IDC_job_loss - overlap_job_loss_noself) %>%
+  mutate(across(starts_with(c("terminated", "IDC", "grant", "combined")), ~ log(.x + 1), .names =  "{.col}_log"))
+
+#add state name
+county_commute_NIH_sum_narrow <- read.csv("data/county_pop.csv") %>%
+                      mutate(FIPS = str_pad(FIPS, 5, pad = "0")) %>%
+                      right_join(county_commute_NIH_sum_narrow) 
+
+county_commute_NIH_sum_narrow <- read.csv("data/state_abbrev.csv") %>%
+  rename(state_code = Abbreviation,
+         state = State) %>%
+  left_join(state_dict) %>%
+  right_join(county_commute_NIH_sum_narrow) %>%
+  select(-state_FIPS) %>%
+  filter(FIPS != "0")
+
+write.csv(county_commute_NIH_sum_narrow, "output/NIH_impact_county_narrow.csv", row.names=FALSE)
 
 ```
 
 # Congressional Districts
 
 ```{r Prep District Commuter Flows}
-cong_commute <- read.csv("./data/JT_congress_July30.csv") %>%
-  mutate(Cong_ORIGIN = str_pad(Cong_ORIGIN, 4, pad = "0"),
-         Cong_DESTINATION = str_pad(Cong_DESTINATION, 4, pad = "0"))
+cong_commute <- read.csv("./data/home_119_workTR.csv") %>%
+  mutate(Cong_DESTINATION = str_pad(w_tract, 11, pad = "0"),
+         Cong_ORIGIN = str_pad(h_cd119, 4, pad = "0")) %>%
+  rename(commuters = commutes) %>%
+  filter(!is.na(Cong_ORIGIN))
 
 cong_info <- read.csv("./data/us_representatives_119th_congress.csv") %>%
   mutate(GEOID = str_pad(GEOID, 4, pad = "0")) %>%
@@ -456,13 +729,13 @@ cong_info <- read.csv("./data/us_representatives_119th_congress.csv") %>%
 #get total workers per cong district
 cong_commute_sum <- cong_commute %>%
   group_by(Cong_DESTINATION) %>%
-  summarise(total_workers = sum(COMMUTES))
+  summarise(total_workers = sum(commuters, na.rm=TRUE))
 
 #merge in total workers
 cong_commute <- left_join(cong_commute, cong_commute_sum)
 
 #calculate proportion of workers who work in district X who live in district Y
-cong_commute$proportion <- cong_commute$COMMUTES / cong_commute$total_workers
+cong_commute$proportion <- cong_commute$commuters / cong_commute$total_workers
 ```
 
 ```{r Merge Cong Data}
@@ -471,25 +744,35 @@ NIH_sum_GEOID <- NIH_clean_fips %>%
   group_by(GEOID) %>% 
   summarise(across(starts_with(c("IDC", "grant", "overlap")), ~ sum(.x, na.rm = TRUE))) 
 
+NIH_sum_tract <- NIH_clean_fips %>% 
+  group_by(tractid) %>% 
+  summarise(across(starts_with(c("IDC", "grant", "overlap")), ~ sum(.x, na.rm = TRUE))) 
+
 term_tab %>%
+  select("award_remaining", "award_remaining_noself", "GEOID", "state", "state_code", "tractid") %>%
+  left_join(state_mult %>% rename(state_code = state)) %>%
   mutate(award_remaining = ifelse(award_remaining <0 , 0 , award_remaining),
          award_remaining_noself = ifelse(award_remaining_noself <0 , 0 , award_remaining_noself)) %>%
-  select(award_remaining, award_remaining_noself, GEOID) %>%
   rename(terminated_loss = award_remaining,
          terminated_loss_noself = award_remaining_noself) %>%
-  mutate(terminated_econ_loss = terminated_loss * econ_multiplier,
-         terminated_job_loss = terminated_loss / job_value,
-         terminated_econ_loss_noself = terminated_loss_noself * econ_multiplier,
-         terminated_job_loss_noself = terminated_loss_noself / job_value) %>%
+  mutate(terminated_econ_loss = terminated_loss * econ_mult,
+         terminated_job_loss = terminated_loss*job_val,
+         terminated_econ_loss_noself = terminated_loss_noself * econ_mult,
+         terminated_job_loss_noself = terminated_loss_noself*job_val) %>%
+  group_by(tractid, GEOID) %>%
+  summarise(across(starts_with(c("terminated")), ~ sum(.x, na.rm = TRUE))) -> term_sum_tract
+
+term_sum_tract %>%
   group_by(GEOID) %>%
   summarise(across(starts_with(c("terminated")), ~ sum(.x, na.rm = TRUE)))  -> term_sum_GEOID
+
 
 NIH_sum_GEOID %>% merge(term_sum_GEOID %>% select(GEOID, terminated_econ_loss), all.x=TRUE) %>%
 write.csv("output/static_loss_cong.csv", row.names=FALSE)
 
 #combine commuter data with NIH data
-cong_commute_NIH <- merge(cong_commute, term_sum_GEOID, by.x = "Cong_DESTINATION", by.y = "GEOID", all = TRUE) %>%
-                      merge(., NIH_sum_GEOID, by.x = "Cong_DESTINATION", by.y = "GEOID", all = TRUE)
+cong_commute_NIH <- merge(cong_commute, term_sum_tract, by.x = "Cong_DESTINATION", by.y = "tractid", all = TRUE) %>%
+                      merge(., NIH_sum_tract, by.x = "Cong_DESTINATION", by.y = "tractid", all = TRUE)
 ```
 
 
@@ -499,6 +782,7 @@ cong_commute_NIH <- mutate_all(cong_commute_NIH, funs(replace(., is.na(.), 0)))
 
 #use commuter flows (e.g., proportion of people who work in district X but live in district Y) to weight the impact of NIH funding
 cong_commute_NIH_sum <- cong_commute_NIH %>%
+  select(-GEOID) %>%
   mutate(across(starts_with(c("terminated", "IDC", "grant", "overlap")), ~ . * proportion)) %>%
   rename(GEOID = Cong_ORIGIN) %>%
   group_by(GEOID) %>% 

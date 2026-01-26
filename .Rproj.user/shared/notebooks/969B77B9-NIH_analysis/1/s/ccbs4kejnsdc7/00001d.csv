@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 "0","    #NOTE THAT WE ARE CURRENTLY MISSING ELECTION RETURNS FROM ALASKA"
 "0",""
 "0",""
@@ -179,3 +180,8 @@
 "2","Warning: [38;5;252mAll aesthetics have length 1, but the data has 359 rows.
 [36mℹ[38;5;252m Please consider using `annotate()` or provide this layer with data containing a single row.[39m"
 "0","plot_grid(urb_plot, par_plot, nrow=2)"
+=======
+version https://git-lfs.github.com/spec/v1
+oid sha256:fcbbb341b861efae2ce7fcb68e92d4e78f5304f9ee0d00ed9b7f894b40a6f254
+size 13472
+>>>>>>> origin/main
