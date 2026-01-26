@@ -1,19 +1,3 @@
-"0","NIH_clean_fips <- read.csv(file=""output/methods/NIH_clean_fips.csv"")"
-"0",""
-"0","NIH_clean_fips %>% "
-"0","  filter(FIPS %in% c(""13089"", ""48201"", ""42003"")) %>% "
-"0","  select(org_name, lat, lon, FIPS, IDC_econ_loss) %>% "
-"0","  group_by(org_name, lat, lon, FIPS) %>%"
-"0","  summarize(IDC_econ_loss = sum(IDC_econ_loss)) %>%"
-"0","  arrange(FIPS, desc(IDC_econ_loss)) %>%"
-"0","write.csv(""figs/fig1-points.csv"", row.names = FALSE)"
-"2","`summarise()` has grouped output by 'org_name', 'lat', 'lon'. You can override using the `.groups` argument."
-"0","county_commute <- read.csv(""output/methods/county_commute_NIH.csv"") %>%"
-"0","  mutate(DESTINATION = str_pad(DESTINATION, 5, pad = ""0"")) %>%"
-"0","  mutate(ORIGIN = str_pad(ORIGIN, 5, pad = ""0"")) %>%"
-"0","  filter(DESTINATION %in% c(""13089"", ""48201"", ""42003"")) %>%"
-"0","  mutate(IDC_econ_loss = proportion*IDC_econ_loss) %>%"
-"0","  select(ORIGIN, DESTINATION, IDC_econ_loss) %>%"
-"0","  write.csv(""figs/fig1-vals.csv"", row.names=FALSE)"
-"0","  "
-"0",""
+version https://git-lfs.github.com/spec/v1
+oid sha256:10f8a87cf571fd1b1b940f22bce3857b422f2dabd07676270eb581dddc572733
+size 1059
