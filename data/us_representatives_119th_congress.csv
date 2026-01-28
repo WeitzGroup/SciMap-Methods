@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 OBJECTID,GEOID,STFIPS,CDFIPS,STATE_ABBR,NAME,LAST_NAME,PARTY,SQMI,STATE_NAME,Shape__Area,Shape__Length
 1,0101,01,01,AL,Barry Moore,Moore,Republican,7335.82,Alabama,1.79618079,22.88010915
 2,0102,01,02,AL,Shomari Figures,Figures,Democrat,9551.34,Alabama,2.354936287,15.28121835
@@ -441,8 +440,3 @@ OBJECTID,GEOID,STFIPS,CDFIPS,STATE_ABBR,NAME,LAST_NAME,PARTY,SQMI,STATE_NAME,Sha
 439,6998,69,98,MP,Kimberlyn King-Hinds,King-Hinds,Republican,184.46,Northern Mariana,0.040336333,3.252966049
 440,7298,72,98,PR,Pablo José Hernández,Hernández,Democrat,3486.4,Puerto Rico,0.771304755,6.861808524
 441,7898,78,98,VI,Stacey E. Plaskett,Plaskett,Democrat,137.41,Virgin Islands,0.030357336,2.991084441
-=======
-version https://git-lfs.github.com/spec/v1
-oid sha256:c69df37887518fbab025b6d42866c210f839163f999f292b9c147b10a5326352
-size 40895
->>>>>>> origin/main
