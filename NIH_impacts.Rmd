@@ -24,10 +24,15 @@ options(scipen=999)
 
 ```
 
+```{r Loading OSF data}
+#2024 NIH data
+NIH <- read_csv("https://osf.io/4trj7/download")
+```
+
 ```{r Data Wrangling - for IDCS}
 
-#2024 NIH data
-NIH <- read.csv("data/NIH_raw.csv")
+#format column names to match
+names(NIH) <- make.names(names(NIH))
 
 #select relevant variables
 NIH_clean <- select(NIH, "Application.ID", "Organization.Name", "Project.Title", "Total.Cost", "Direct.Cost.IC", "Indirect.Cost.IC", "Organization.State", "Organization.City", "Latitude", "Longitude", "CFDA.Code", "Project.Number")
@@ -52,6 +57,7 @@ for (i in 1:nrow(NIH_clean)){
   }
 }
 
+#deletes first character of project number
 NIH_clean$proj.num <- str_sub(NIH_clean$proj.num, 2)
 
 ```
@@ -63,7 +69,7 @@ NIH_tract_fips <- read.csv("data/tract_dictionary.csv") %>%
             mutate(FIPS = substr(tractid, 0, 5)) %>%
             filter(lat!=0 & !is.na(FIPS)) %>%
             select(tractid, FIPS, lat, lon) %>%
-            distinct() 
+            distinct()
 
 NIH_geoid <- read.csv("data/geoid_dictionary_July4.csv") %>%
             select(-GEOID) %>%
@@ -80,7 +86,7 @@ NIH_clean_fips <- filter(NIH_clean_fips, !is.na(FIPS))
 ```
 
 ```{r terminated grants}
-term_tab_orig <- read.csv("data/nih_terminations.csv") %>%
+term_tab_orig <- read_csv("https://osf.io/txmjw/download") %>%
   mutate(award_remaining = as.numeric(str_replace(total_estimated_remaining, "\\$", ""))) %>%
   mutate(org_name = toupper(org_name)) %>%
   mutate(award_remaining_noself = ifelse(cancellation_source == "Self reported", 0 , award_remaining)) %>%
@@ -95,7 +101,7 @@ term_tab <- term_tab_orig
 repeated_dict <- read.csv("data/repeated_orgs.csv") 
 # patch bc university of colorado schools are all called the same thing
 unique(term_tab$org_congdist[term_tab$org_name == "UNIVERSITY OF COLORADO"])
-term_tab$org_name[term_tab$org_name=="UNIVERSITY OF COLORADO" & term_tab$org_city == "Boulder"] <- "UNIVERSITY OF COLORADO - COLORADO SPRINGS"
+term_tab$org_name[term_tab$org_name=="UNIVERSITY OF COLORADO" & term_tab$org_city != "Boulder"] <- "UNIVERSITY OF COLORADO - COLORADO SPRINGS"
 term_tab$org_name[term_tab$org_name=="HARVARD UNIVERSITY D/B/A HARVARD SCHOOL OF PUBLIC HEALTH"] <- "HARVARD SCHOOL OF PUBLIC HEALTH"
 
 # use FY2024 grants to geolocate terminated grants (by matching to org name)
@@ -118,7 +124,7 @@ loc_tab <-read.csv("data/geoid_dictionary_July4.csv") %>%
             filter(!is.na(org_name))
 
 loc_tab$org_name[loc_tab$org_name=="UNIVERSITY OF COLORADO" & loc_tab$GEOID == "0805"] <- "UNIVERSITY OF COLORADO - COLORADO SPRINGS"
-loc_tab$org_name[loc_tab$org_name=="UNIVERSITY OF COLORADO" & loc_tab$GEOID == "0802"] <- "UNIVERSITY OF COLORADO BOULDER"
+loc_tab$org_name[loc_tab$org_name=="UNIVERSITY OF COLORADO" & loc_tab$GEOID == "0802"] <- "UNIVERSITY OF COLORADO - BOULDER"
 
 # find termination grants that aren't in the location table
 # (org didn't receive funds in FY2024)
@@ -130,8 +136,11 @@ term_tab %>%
   filter(! is.na(org_state) & ! org_state %in% canada_prov & org_state != "PR" & org_state != "VI") %>%
   select(org_name) %>% unique() -> missing_loc
 
+NIH_prior <- read_csv("https://osf.io/ex89k/download")
+names(NIH_prior) <- make.names(names(NIH_prior))
+
 # find the lat/lon for these orgs based on prior year funding
-missing_coords <- read.csv("data/NIH_prior.csv") %>%
+missing_coords <- NIH_prior %>%
   mutate(org_name = toupper(Organization.Name)) %>%
   select(org_name, Longitude, Latitude) %>%
   rename(lon = Longitude,
@@ -142,7 +151,6 @@ missing_coords <- read.csv("data/NIH_prior.csv") %>%
 
 # if there are more organizations added with missing coords, will need to relocate
 # using API call: https://geo.fcc.gov/api/census/block/find?latitude=lat&longitude=long&showall=true&format=json
-
 
 missing_fips <- data.frame(org_name =  c("ECOHEALTH ALLIANCE, INC.",
                                          #"FUNCTION PROMOTING THERAPIES, LLC",
@@ -295,7 +303,8 @@ write.csv(NIH_clean_fips, "./output/NIH_clean_fips.csv", row.names=F)
 # COMMUTES: is the number of workers commuting from the specific ORIGIN to DESTINATION
 
 # IMPORTANT: some FIPS codes have leading zeros
-commute_raw <- fread("./data/OD_tract-to-county_2016.csv") %>% 
+
+commute_raw <- fread("https://osf.io/8tq67/download") %>% 
   mutate(DESTINATION = str_pad(W_geocode, 11, pad = "0"),
          ORIGIN = str_pad(H_geocode, 5, pad = "0"))
 
@@ -407,13 +416,14 @@ sum(is.na(county_commute_NIH_sum$state_code))
 
 write.csv(county_commute_NIH_sum, "output/NIH_impact_county.csv", row.names=FALSE)
 ```
+
 ```{r institution level calculations}
 NIH_clean_fips %>%
   group_by(org_name, tractid) %>%
   summarize(across(starts_with("IDC"), ~ sum(., na.rm=TRUE)))-> IDC_inst
 
 #combine commuter data with NIH data
-county_commute_NIH_inst <- merge(commute, IDC_inst, by.x = "DESTINATION", by.y = "tractid", all.x = TRUE) 
+county_commute_NIH_inst <- merge(commute, IDC_inst, by.x = "DESTINATION", by.y = "tractid", all.x = TRUE)
 
 #replace all NA values with zeros
 county_commute_NIH_inst <- mutate_all(county_commute_NIH_inst , funs(replace(., is.na(.), 0))) %>%
@@ -429,22 +439,21 @@ write.csv(county_commute_NIH_inst, "output/county_commute_NIH_inst.csv", row.nam
 ```
 
 ```{r county-stayvflow}
-#how much we assume stays in county - no commuting
-county_varystatic <- map_df(seq(0, 1, by = 0.05), function(mult) {
+#proportion of funds we assume stays in origin county - no commuting
+county_varystatic <- map_df(seq(0, 1, by = 0.05), function(rho) {
   county_commute_NIH %>%
-    mutate(proportion = ifelse(ORIGIN == substr(DESTINATION, 1, 5), mult + (1 - mult) * proportion, (1 - mult) * proportion)) %>%
-    mutate(across(starts_with(c("terminated", "IDC", "grant", "overlap")), ~ . * proportion)) %>%
+    mutate(prop_origin = ifelse(ORIGIN == substr(DESTINATION, 1, 5), rho + (1 - rho) * proportion, (1 - rho) * proportion)) %>%
+    mutate(across(starts_with(c("terminated", "IDC", "grant", "overlap")), ~ . * prop_origin)) %>%
     rename(FIPS = ORIGIN) %>%
     group_by(FIPS) %>% 
     summarise(across(starts_with(c("terminated", "IDC", "grant", "overlap")), ~ sum(.x, na.rm = TRUE))) %>%
-    mutate(mult = mult)
+    mutate(rho = rho)
 })
 
 
 print(nrow(county_varystatic))
 
 write.csv(county_varystatic, "output/NIH_impact_county-sens.csv", row.names=FALSE)
-
 
 ```
 
@@ -527,7 +536,7 @@ write.csv(diff_mult_county, "output/NIH_impact_county-natlmult.csv", row.names=F
 
 
 ```{r 2022-flows}
-commute_raw_22 <- fread("./data/home_county_workTR_2022.csv") %>% 
+commute_raw_22 <- read_csv("https://osf.io/tqkj7/download") %>% 
   mutate(DESTINATION = str_pad(work_tract, 11, pad = "0"),
          ORIGIN = str_pad(home_county, 5, pad = "0"))
 
@@ -584,7 +593,7 @@ write.csv(county_commute_NIH_sum_22, "output/NIH_impact_county-22.csv", row.name
 
 ```{r rac-wac-output}
 # calculate the proportion of residents in relevant sectors
-rac_df <- read.csv("data/RAC_countyAll.csv" ) %>% 
+rac_df <- read.csv("data/RAC_countyAll.csv") %>% 
           mutate(ORIGIN = str_pad(HomeCounty, 5, pad = "0")) %>%
           mutate(broad_sum_rac = sum.CNS03.+sum.CNS04.+sum.CNS05.+sum.CNS07.+
                              sum.CNS08.+sum.CNS12.+sum.CNS13.+sum.CNS14.+
@@ -598,7 +607,7 @@ rac_df <- read.csv("data/RAC_countyAll.csv" ) %>%
 
  
 # calculate proportion of workers in relevant sectors
-wac_df <- read.csv("data/WAC_tractAll.csv" ) %>% 
+wac_df <- read.csv("data/WAC_tractAll.csv") %>% 
           mutate(DESTINATION = str_pad(WorkTract, 11, pad = "0")) %>%
           mutate(broad_sum_wac = sum.CNS03.+sum.CNS04.+sum.CNS05.+sum.CNS07.+
                              sum.CNS08.+sum.CNS12.+sum.CNS13.+sum.CNS14.+
@@ -713,7 +722,7 @@ write.csv(county_commute_NIH_sum_narrow, "output/NIH_impact_county_narrow.csv", 
 # Congressional Districts
 
 ```{r Prep District Commuter Flows}
-cong_commute <- read.csv("./data/home_119_workTR.csv") %>%
+cong_commute <- read_csv("https://osf.io/6fdeg/download") %>%
   mutate(Cong_DESTINATION = str_pad(w_tract, 11, pad = "0"),
          Cong_ORIGIN = str_pad(h_cd119, 4, pad = "0")) %>%
   rename(commuters = commutes) %>%
