@@ -549,7 +549,8 @@ NA,Kusilvak Census Area,AK,149800
 15001,Hawaii,HI,8774703
 15003,Honolulu,HI,65999825
 15007,Kauai,HI,4122688
-NA,Maui + Kalawao,HI,9714929
+15009,Maui,HI,4857464.5
+15005,Kalawao,HI,4857464.5
 16001,Ada,ID,35113870
 16003,Adams,ID,138816
 16005,Bannock,ID,3223311
@@ -2910,29 +2911,61 @@ NA,Maui + Kalawao,HI,9714929
 51770,Roanoke,VA,7806615
 51800,Suffolk,VA,4390327
 51810,Virginia Beach,VA,24018999
-NA,Albemarle + Charlottesville,VA,13569150
-NA,Alleghany + Covington,VA,847265
-NA,"Augusta, Staunton + Waynesboro",VA,5337071
-NA,Campbell + Lynchburg,VA,7482320
-NA,Carroll + Galax,VA,942391
-NA,"Dinwiddie, Colonial Heights + Petersburg",VA,3132880
-NA,"Fairfax, Fairfax + Falls Church",VA,146733771
-NA,Frederick + Winchester,VA,7453213
-NA,Greensville + Emporia,VA,1458365
-NA,Henry + Martinsville,VA,2300927
-NA,James + Williamsburg,VA,6084098
-NA,Montgomery + Radford,VA,6050976
-NA,Pittsylvania + Danville,VA,3695079
-NA,Prince George + Hopewell,VA,4066570
-NA,"Prince William, Manassas + Manassas Park",VA,23734783
-NA,Roanoke + Salem,VA,6415540
-NA,"Rockbridge, Buena Vista + Lexington",VA,1337186
-NA,Rockingham + Harrisonburg,VA,8287227
-NA,Southampton + Franklin,VA,820314
-NA,Spotsylvania + Fredericksburg,VA,7328004
-NA,Washington + Bristol,VA,3448289
-NA,Wise + Norton,VA,1639863
-NA,York + Poquoson,VA,3035893
+51003,Albemarle,VA,6784575
+51540,Charlottesville,VA,6784575
+51005,Alleghany,VA,423632.5
+51580,Covington,VA,423632.5
+51015,Augusta,VA,1779023.6666666667
+51790,Staunton,VA,1779023.6666666667
+51820,Waynesboro,VA,1779023.6666666667
+51031,Campbell,VA,3741160
+51680,Lynchburg,VA,3741160
+51035,Carroll,VA,471195.5
+51640,Galax,VA,471195.5
+51053,Dinwiddie,VA,1044293.3333333334
+51570,Colonial Heights,VA,1044293.3333333334
+51730,Petersburg,VA,1044293.3333333334
+51059,Fairfax,VA,48911257
+51600,Fairfax,VA,48911257
+51059,Fairfax,VA,48911257
+51600,Fairfax,VA,48911257
+51610,Falls Church,VA,48911257
+51069,Frederick,VA,3726606.5
+51840,Winchester,VA,3726606.5
+51081,Greensville,VA,729182.5
+51595,Emporia,VA,729182.5
+51089,Henry,VA,1150463.5
+51690,Martinsville,VA,1150463.5
+51095,James,VA,3042049
+51830,Williamsburg,VA,3042049
+51121,Montgomery,VA,3025488
+51750,Radford,VA,3025488
+51143,Pittsylvania,VA,1847539.5
+51590,Danville,VA,1847539.5
+51149,Prince George,VA,2033285
+51670,Hopewell,VA,2033285
+51153,Prince William,VA,7911594.333333333
+51683,Manassas,VA,7911594.333333333
+51685,Manassas Park,VA,7911594.333333333
+51161,Roanoke,VA,3207770
+51770,Roanoke,VA,3207770
+51775,Salem,VA,3207770
+51163,Rockbridge,VA,445728.6666666667
+51530,Buena Vista,VA,445728.6666666667
+51678,Lexington,VA,445728.6666666667
+51165,Rockingham,VA,4143613.5
+51660,Harrisonburg,VA,4143613.5
+51175,Southampton,VA,410157
+51067,Franklin,VA,410157
+51620,Franklin,VA,410157
+51177,Spotsylvania,VA,3664002
+51630,Fredericksburg,VA,3664002
+51191,Washington,VA,1724144.5
+51520,Bristol,VA,1724144.5
+51195,Wise,VA,819931.5
+51720,Norton,VA,819931.5
+51199,York,VA,1517946.5
+51735,Poquoson,VA,1517946.5
 53001,Adams,WA,725966
 53003,Asotin,WA,726576
 53005,Benton,WA,12676667
