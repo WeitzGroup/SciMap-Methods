@@ -20,6 +20,71 @@ in the output folder, and output figures are in the figs folder. More
 detailed descriptions follow. Code developed for R version 4.4.1. Each
 script should take 1-5 minutes to run.
 
+## Project Structure
+
+```
+SciMap-Methods/
+├── data/                                   # Raw data
+│   ├── CD_pop2024.csv                      
+│   ├── JT_congress_July30.csv              
+│   ├── OD_countySum001_2016.csv
+│   ├── RAC_countyAll.csv
+│   ├── Ruralurbancontinuumcodes2023.csv    
+│   ├── WAC_tract.csv
+│   ├── county_gdp.csv
+│   ├── county_pop.csv
+│   ├── fips_dictionary.csv
+│   ├── geoid_dictionary_July4.csv
+│   ├── od_congdist_119_sum000_2016.csv
+│   ├── org_names_corrected.csv
+│   ├── repeated_orgs.csv
+│   ├── state-multiplier-urm.csv
+│   ├── state_abbrev.csv
+│   ├── state_and_county_fips_master.csv
+│   ├── state_fips_master.csv
+│   ├── tract_dictionary.csv
+│   └── us_representatives_119th_congress.csv
+├── output/                                 # Processed data from NIH_impacts.Rmd
+│   ├── backup/                             
+│   │   ├── NIH_clean_fips.csv              
+│   │   ├── NIH_impact_cong.csv             
+│   │   ├── NIH_impact_county.csv           
+│   │   ├── NIH_impact_state.csv            
+│   │   ├── county_commute_NIH.csv
+│   │   ├── county_commute_NIH_inst.csv
+│   │   ├── static_loss_cong.csv
+│   │   ├── static_loss_county.csv
+│   │   ├── static_vs_commuter-CD.csv
+│   │   ├── static_vs_commuter.csv
+│   │   └── terminated_points.csv           
+│   ├── CD_partisanship.tex                 
+│   ├── NIH_clean_fips.csv                  
+│   ├── NIH_impact_cong.csv                 
+│   ├── NIH_impact_county-22.csv            
+│   ├── NIH_impact_county-ctc.csv
+│   ├── NIH_impact_county-diffmult.csv
+│   ├── NIH_impact_county-natlmult.csv
+│   ├── NIH_impact_county-sens.csv
+│   ├── NIH_impact_county_broad.csv
+│   ├── NIH_impact_county_narrow.csv
+│   ├── NIH_impact_state.csv
+│   ├── comp_natlmult_IDC_FIPS.csv
+│   ├── county_commute_NIH.csv
+│   ├── county_commute_NIH_county.csv
+│   ├── county_commute_NIH_inst.csv
+│   ├── county_urb.tex
+│   ├── static_loss_cong.csv
+│   ├── static_loss_county.csv
+│   ├── static_vs_commuter-CD.csv
+│   ├── static_vs_commuter.csv
+│   ├── static_vs_commuter_IDC_FIPS.csv
+│   ├── static_vs_commuter_term_FIPS.csv
+│   └── terminated_points.csv
+├── NIH_analysis.Rmd                        # Generate figures and tables
+├── NIH_impacts.Rmd                         # Data processing
+└── README.md
+```
+
 ## Data
 
 -   county_pop - county FIPS, state name, county name, and population
