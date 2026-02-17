@@ -15,3 +15,4 @@ data/OD_tract-to-county_2016.csv
 output/county_commute_NIH.csv  
 output/county_commute_NIH_county2county.csv
 
+.Rproj.user
