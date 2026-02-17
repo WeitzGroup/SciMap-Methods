@@ -23,20 +23,13 @@ script should take 1-5 minutes to run.
 ## Project Structure
 
 ```
-SciMap-Methods/
 ├── data/                                   # Raw data
-│   ├── CD_pop2024.csv                      
-│   ├── JT_congress_July30.csv              
-│   ├── OD_countySum001_2016.csv
+│   ├── CD_pop2024.csv
 │   ├── RAC_countyAll.csv
 │   ├── Ruralurbancontinuumcodes2023.csv    
 │   ├── WAC_tract.csv
-│   ├── county_gdp_2023.csv
 │   ├── county_pop.csv
-│   ├── fips_dictionary.csv
 │   ├── geoid_dictionary_July4.csv
-│   ├── home_119_workTR.csv
-│   ├── od_congdist_119_sum000_2016.csv
 │   ├── org_names_corrected.csv
 │   ├── repeated_orgs.csv
 │   ├── state-multiplier-urm.csv
@@ -58,7 +51,6 @@ SciMap-Methods/
 │   ├── NIH_impact_county_narrow.csv
 │   ├── NIH_impact_state.csv
 │   ├── comp_natlmult_IDC_FIPS.csv
-│   ├── county_commute_NIH.csv
 │   ├── county_commute_NIH_inst.csv
 │   ├── county_urb.tex
 │   ├── static_loss_cong.csv
