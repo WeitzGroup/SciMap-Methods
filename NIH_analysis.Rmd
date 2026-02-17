@@ -46,8 +46,14 @@ NIH_clean_fips %>%
   arrange(FIPS, desc(IDC_econ_loss)) %>%
 write.csv("figs/fig1-points.csv", row.names = FALSE)
 
+if(file.exists("output/county_commute_NIH.csv")){
+  county_commute <- read.csv("output/county_commute_NIH.csv")
+} else {
+  county_commute <- read_csv("https://osf.io/sxcqj/download")
+}
+
 # Calculate proportion of economic loss in commuter counties nearby
-county_commute <- read.csv("output/county_commute_NIH.csv") %>%
+county_commute <- county_commute %>%
   mutate(DESTINATION = str_pad(DESTINATION, 5, pad = "0")) %>%
   mutate(ORIGIN = str_pad(ORIGIN, 5, pad = "0")) %>%
   filter(startsWith(DESTINATION, c("13089", "48201", "42003"))) %>%

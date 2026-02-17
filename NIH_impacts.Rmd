@@ -21,7 +21,7 @@ library(magrittr)
 library(data.table)
 
 options(scipen=999)
-
+options(datatable.use.logical64 = TRUE)
 ```
 
 ```{r Loading OSF data}
@@ -83,6 +83,8 @@ NIH_clean_fips <- left_join(NIH_clean, NIH_tract_fips) %>%
 
 NIH_clean_fips <- filter(NIH_clean_fips, !is.na(FIPS))
 
+NIH_clean_fips %>%
+  filter(FIPS == "06059")
 ```
 
 ```{r terminated grants}
@@ -91,9 +93,11 @@ term_tab_orig <- read_csv("https://osf.io/txmjw/download") %>%
   mutate(org_name = toupper(org_name)) %>%
   mutate(award_remaining_noself = ifelse(cancellation_source == "Self reported", 0 , award_remaining)) %>%
   # exclude reinstated grants
-  filter(is.na(reinstated_est_date)) %>%
+  filter(is.na(reinstated_est_date) & is.na(unfrozen_date)) %>%
     mutate(award_remaining = ifelse(award_remaining <0 , 0 , award_remaining),
            award_remaining_noself = ifelse(award_remaining_noself <0 , 0 , award_remaining_noself)) 
+
+filter(term_tab, org_name== "UNIVERSITY OF CALIROFNIA-IRVINE")
 
 term_tab <- term_tab_orig
 
@@ -108,15 +112,17 @@ term_tab$org_name[term_tab$org_name=="HARVARD UNIVERSITY D/B/A HARVARD SCHOOL OF
 loc_tab <- NIH_clean_fips %>%
   mutate(FIPS = str_pad(FIPS, 5, pad = "0")) %>%
   mutate(org_name = toupper(org_name)) %>%
-  mutate(lat = as.numeric(lat),
-         lon = as.numeric(lon)) %>%
+  mutate(lat = round(as.numeric(lat), 5),
+         lon = round(as.numeric(lon), 5)) %>%
   select(org_name, lat, lon, FIPS, tractid) %>%
   distinct() %>%
   filter(!is.na(org_name))
 
 loc_tab <-read.csv("data/geoid_dictionary_July4.csv") %>%
             select(-GEOID) %>%
-            mutate(GEOID = str_pad(New119Fips, 4, pad = "0")) %>%
+            mutate(GEOID = str_pad(New119Fips, 4, pad = "0"),
+                   lat = round(lat, 5),
+                   lon = round(lon, 5)) %>%
             select(lat, lon, GEOID) %>%
             distinct() %>%
             left_join(loc_tab) %>%
@@ -135,6 +141,10 @@ term_tab %>%
   # remove grants from Canada, territories
   filter(! is.na(org_state) & ! org_state %in% canada_prov & org_state != "PR" & org_state != "VI") %>%
   select(org_name) %>% unique() -> missing_loc
+
+static_loss <- read.csv("output/static_loss_county.csv") %>%
+mutate(FIPS = str_pad(FIPS, 5, pad = "0"))
+filter(static_loss, terminated_econ_loss>0) %>% select(FIPS) %>% distinct() %>% nrow()
 
 NIH_prior <- read_csv("https://osf.io/ex89k/download")
 names(NIH_prior) <- make.names(names(NIH_prior))
@@ -179,7 +189,7 @@ term_tab %<>%
   distinct() %>%
   left_join(loc_tab) %>%
   filter(!is.na(FIPS)) %>%
-  mutate(state_FIPS = substr(FIPS, 1, 2)) 
+  mutate(state_FIPS = substr(FIPS, 1, 2))
 
 term_tab <- repeated_dict %>%
   right_join(term_tab) %>%
