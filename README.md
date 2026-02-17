@@ -44,19 +44,7 @@ SciMap-Methods/
 │   ├── state_fips_master.csv
 │   ├── tract_dictionary.csv
 │   └── us_representatives_119th_congress.csv
-├── output/                                 # Processed data from NIH_impacts.Rmd
-│   ├── backup/                             
-│   │   ├── NIH_clean_fips.csv              
-│   │   ├── NIH_impact_cong.csv             
-│   │   ├── NIH_impact_county.csv           
-│   │   ├── NIH_impact_state.csv            
-│   │   ├── county_commute_NIH.csv
-│   │   ├── county_commute_NIH_inst.csv
-│   │   ├── static_loss_cong.csv
-│   │   ├── static_loss_county.csv
-│   │   ├── static_vs_commuter-CD.csv
-│   │   ├── static_vs_commuter.csv
-│   │   └── terminated_points.csv           
+├── output/                                 # Processed data from NIH_impacts.Rmd        
 │   ├── CD_partisanship.tex                 
 │   ├── NIH_clean_fips.csv                  
 │   ├── NIH_impact_cong.csv                 
