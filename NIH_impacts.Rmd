@@ -460,7 +460,7 @@ write.csv(county_varystatic, "output/NIH_impact_county-sens.csv", row.names=FALS
 
 ```{r county_county-sens}
 
-commute_raw_ctc <- fread("./data/OD_tract-to-county_2016.csv") %>% 
+commute_raw_ctc <- fread("https://osf.io/8tq67/download") %>% 
   mutate(DESTINATION = str_pad(W_geocode, 11, pad = "0"),
          ORIGIN = str_pad(H_geocode, 5, pad = "0")) %>%
   mutate(DESTINATION = substr(1, 5, DESTINATION))
@@ -620,7 +620,7 @@ wac_df <- read.csv("data/WAC_tractAll.csv") %>%
           select(DESTINATION, broad_prop_wac, narrow_prop_wac)
 
 # join rac and wac files to commuter flow
-commute_raw_sect <- fread("./data/OD_tract-to-county_2016.csv") %>% 
+commute_raw_sect <- fread("https://osf.io/8tq67/download") %>% 
   mutate(DESTINATION = str_pad(W_geocode, 11, pad = "0"),
          ORIGIN = str_pad(H_geocode, 5, pad = "0")) %>%
   select(DESTINATION, ORIGIN, Commuters) %>%
@@ -722,7 +722,7 @@ write.csv(county_commute_NIH_sum_narrow, "output/NIH_impact_county_narrow.csv", 
 # Congressional Districts
 
 ```{r Prep District Commuter Flows}
-cong_commute <- read_csv("https://osf.io/6fdeg/download") %>%
+cong_commute <- fread("https://osf.io/m5kb6/download") %>%
   mutate(Cong_DESTINATION = str_pad(w_tract, 11, pad = "0"),
          Cong_ORIGIN = str_pad(h_cd119, 4, pad = "0")) %>%
   rename(commuters = commutes) %>%

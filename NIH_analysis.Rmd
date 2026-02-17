@@ -62,7 +62,7 @@ county_commute <- read.csv("output/county_commute_NIH.csv") %>%
 ```{r vals, echo=FALSE}
 
 # classify counties into rural/urban
-urbanicity <- read.csv("data/Ruralurbancontinuumcodes2023.csv", skip = 1) %>%
+urbanicity <- read.csv("data/Ruralurbancontinuumcodes2023.csv") %>%
                 mutate(FIPS = str_pad(FIPS, 5, pad = "0")) %>%
                 filter(Attribute=="RUCC_2023") %>%
                 mutate(urban = ifelse(Value %in% c("1", "2", "3"), TRUE, FALSE)) %>%
@@ -233,7 +233,7 @@ comp %>% filter(static_term_loss>0) %>% nrow()
 top_term <- arrange(comp, desc(static_term_loss)) %>% select(FIPS, static_term_loss) %>% mutate(static_term_loss=static_term_loss/1000000000) %>% head(10) 
 
 # get names of top_term
-read.csv("data/county_pop.csv", skip = 1) %>%
+read.csv("data/county_pop.csv") %>%
     mutate(FIPS = str_pad(FIPS, 5, pad = "0")) %>%
     right_join(top_term) %>% arrange(desc(static_term_loss))
 
@@ -592,7 +592,7 @@ comp_CD %>% filter(pol_party == "Democrat" & static_IDC_loss != 0) %>%
 # classify as metro, metro-adjacent, or nonmetro
 comp %>%
 # population size
-    left_join(read.csv("data/county_pop.csv", skip = 1) %>%
+    left_join(read.csv("data/county_pop.csv") %>%
                   mutate(FIPS = str_pad(FIPS, 5, pad = "0")) %>%
                   select(FIPS, pop_2024))  %>%
     arrange(desc(IDC_econ_loss)) %>%
@@ -611,7 +611,7 @@ cat(file="figs/county_urb.tex")
 
 # top 3 per category organized by 
 comp %>%
-    left_join(read.csv("data/county_pop.csv", skip = 1) %>%
+    left_join(read.csv("data/county_pop.csv") %>%
                   mutate(FIPS = str_pad(FIPS, 5, pad = "0")) %>%
                   select(FIPS, pop_2024))  %>%
     filter(static_IDC_loss == 0 & IDC_econ_loss > 100000) %>%
@@ -621,7 +621,7 @@ comp %>%
   slice_max(pop_2024, n=3)
 
 # classify as Republican, intermediate, or Democratic
-comp_CD_tab <- read.csv("data/CD_pop2024.csv", skip = 1) %>%
+comp_CD_tab <- read.csv("data/CD_pop2024.csv") %>%
   mutate(state = sub(" [^ ]+$", "", District),
          dist_num = as.numeric(sub(".*\\s+", "", District)),
          pop_2024 = as.numeric(gsub(",", "", Population))) %>%
@@ -668,7 +668,7 @@ comp_CD_tab %>%
 ```{r sens-rho25}
 county_sens <- read.csv("output/NIH_impact_county-sens.csv") %>%
                     mutate(FIPS = str_pad(FIPS, 5, pad = "0")) %>%
-                    filter(mult == .25) %>%
+                    filter(rho == .25) %>%
                     select("FIPS", "IDC_econ_loss", "terminated_econ_loss") %>%
                     rename(IDC_sens = IDC_econ_loss,
                            term_sens = terminated_econ_loss)
@@ -750,7 +750,7 @@ county_varystatic %>%
 ```
 
 ```{r state-mult}
-read.csv("data/state-multiplier-urm.csv", skip = 1) %>% 
+read.csv("data/state-multiplier-urm.csv") %>% 
         rename(tot_fund = 2, 
                econ_act = 9,
                state= 1) %>%

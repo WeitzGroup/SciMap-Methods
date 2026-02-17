@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 "FIPS","terminated_loss","terminated_loss_noself","terminated_econ_loss","terminated_job_loss","terminated_econ_loss_noself","terminated_job_loss_noself","IDC_loss","IDC_econ_loss","IDC_job_loss","grant_funds","grant_funds_econ","overlap_loss","overlap_econ_loss","overlap_job_loss","overlap_loss_noself","overlap_econ_loss_noself","overlap_job_loss_noself","state_FIPS","combined_loss","combined_econ_loss","combined_job_loss","combined_loss_noself","terminated_loss_log","terminated_loss_noself_log","terminated_econ_loss_log","terminated_job_loss_log","terminated_econ_loss_noself_log","terminated_job_loss_noself_log","IDC_loss_log","IDC_econ_loss_log","IDC_job_loss_log","grant_funds_log","grant_funds_econ_log","combined_loss_log","combined_econ_loss_log","combined_job_loss_log","combined_loss_noself_log"
 "01001",0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"01",0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 "01003",0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"01",0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
@@ -3145,8 +3144,3 @@
 "56043",0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"56",0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 "56045",0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"56",0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 NA,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,NA,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-=======
-version https://git-lfs.github.com/spec/v1
-oid sha256:e0f0db28c3dfb77126d199d80694844cdba67970562068438574a38e9fdd10b7
-size 271277
->>>>>>> origin/main
