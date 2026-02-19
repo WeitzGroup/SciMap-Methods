@@ -49,7 +49,7 @@ write.csv("figs/fig1-points.csv", row.names = FALSE)
 if(file.exists("output/county_commute_NIH.csv")){
   county_commute <- read.csv("output/county_commute_NIH.csv")
 } else {
-  county_commute <- read_csv("https://osf.io/sxcqj/download")
+  county_commute <- read_csv("https://osf.io/vh8qz/download")
 }
 
 # Calculate proportion of economic loss in commuter counties nearby
@@ -78,7 +78,13 @@ urbanicity <- read.csv("data/Ruralurbancontinuumcodes2023.csv") %>%
 county_commute_NIH_sum <- read.csv("output/NIH_impact_county.csv") %>%
                              mutate(FIPS = str_pad(FIPS, 5, pad = "0"))
 
-commute_NIH <- read.csv("output/county_commute_NIH.csv") %>% 
+if(file.exists("output/county_commute_NIH.csv")){
+  county_commute_NIH <- read.csv("output/county_commute_NIH.csv")
+} else {
+  county_commute_NIH <- read_csv("https://osf.io/vh8qz/download")
+}
+
+commute_NIH <- county_commute_NIH %>% 
                 mutate(DESTINATION = str_pad(DESTINATION, 11, pad = "0"),
                      ORIGIN = str_pad(ORIGIN, 5, pad = "0"))
                    
@@ -726,6 +732,8 @@ county_main %>% filter(IDC_main>100000) %>% dim()
 county_main %>% filter(term_sens>100000) %>% dim()
 county_main %>% filter(term_main>100000) %>% dim()
   
+print(cor(county_main$IDC_main, county_main$IDC_sens)^2)
+print(cor(county_main$term_main, county_main$term_sens)^2)
 
 ```
 
@@ -797,6 +805,9 @@ ggplot(comp_natl) +
 
 ggsave("figs/supp-comp_natl.png", width=4, height=4, dpi=300)
 
+print(cor(comp_natl$IDC_econ_loss, comp_natl$IDC_econ_loss_natl)^2)
+
+
 ```
 
 ```{r sect-sens}
@@ -836,6 +847,10 @@ psect2 <- ggplot(comp_sect) +
 
 plot_grid(psect1, psect2)
 ggsave("figs/supp-comp_sect.png", width=8, height=4, dpi=300)
+
+print(cor(comp_sect$IDC_econ_loss, comp_sect$broad_IDC_econ_loss)^2)
+print(cor(comp_sect$IDC_econ_loss, comp_sect$narrow_IDC_econ_loss)^2)
+
 ```
 
 ```{r 2022-sens}
@@ -855,5 +870,7 @@ ggplot(comp_22) +
           xlab("Economic Loss with 2016 Commuter Flows ($M)")
 
 ggsave("figs/supp-comp_22.png", width=4, height=4, dpi=300)
+
+print(cor(comp_22$IDC_econ_loss, comp_22$IDC_econ_loss_22, use="complete.obs")^2)
 
 ```
