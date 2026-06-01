@@ -19,6 +19,7 @@ library(readxl)
 library(sf)
 library(magrittr)
 library(data.table)
+library(cowplot)
 
 options(scipen=999)
 options(datatable.use.logical64 = TRUE)
@@ -60,6 +61,15 @@ for (i in 1:nrow(NIH_clean)){
 #deletes first character of project number
 NIH_clean$proj.num <- str_sub(NIH_clean$proj.num, 2)
 
+#if a 15% indirect cost rate max is imposed, this would be the loss
+NIH_clean$IDC_loss <- NIH_clean$indirect - .15 * NIH_clean$direct
+
+#set negative values to zero; these are cases where there were no indirects before, or the IDC rate was <15% already
+NIH_clean$IDC_loss <- ifelse(NIH_clean$IDC_loss < 0, 0, NIH_clean$IDC_loss) 
+
+
+NIH_clean %>% group_by(org_name) %>% summarize(IDC_loss = sum(IDC_loss, na.rm=TRUE)) %>% arrange(desc(IDC_loss)) %>% head(50) %>% write.csv("top50_IDC.csv", row.names=FALSE)
+
 ```
 
 ```{r Get FIPS Codes}
@@ -96,8 +106,6 @@ term_tab_orig <- read_csv("https://osf.io/txmjw/download") %>%
   filter(is.na(reinstated_est_date) & is.na(unfrozen_date)) %>%
     mutate(award_remaining = ifelse(award_remaining <0 , 0 , award_remaining),
            award_remaining_noself = ifelse(award_remaining_noself <0 , 0 , award_remaining_noself)) 
-
-filter(term_tab, org_name== "UNIVERSITY OF CALIROFNIA-IRVINE")
 
 term_tab <- term_tab_orig
 
@@ -427,6 +435,7 @@ sum(is.na(county_commute_NIH_sum$state_code))
 write.csv(county_commute_NIH_sum, "output/NIH_impact_county.csv", row.names=FALSE)
 ```
 
+
 ```{r institution level calculations}
 NIH_clean_fips %>%
   group_by(org_name, tractid) %>%
@@ -546,9 +555,9 @@ write.csv(diff_mult_county, "output/NIH_impact_county-natlmult.csv", row.names=F
 
 
 ```{r 2022-flows}
-commute_raw_22 <- read_csv("https://osf.io/tqkj7/download") %>% 
-  mutate(DESTINATION = str_pad(work_tract, 11, pad = "0"),
-         ORIGIN = str_pad(home_county, 5, pad = "0"))
+commute_raw_22 <- read_csv("data/JT00_mostrecent") %>% head()
+  mutate(DESTINATION = str_pad(w_tract, 11, pad = "0"),
+         ORIGIN = str_pad(h_county, 5, pad = "0"))
 
 # calculate proportion weights
 commute_22 <- commute_raw_22 %>% 
@@ -561,6 +570,8 @@ commute_22 <- commute_raw_22 %>%
   # of workers from ORIGIN who work in DESTINATION divided by the total 
   # number of people who work in DESTINATION
   mutate(proportion = commutes/DESTINATION_total_workers)
+
+
 
 #combine commuter data with NIH data
 county_commute_NIH_22 <- merge(commute_22, term_sum_tract %>% select(-FIPS), by.x = "DESTINATION", by.y = "tractid", all.x = TRUE) %>%
