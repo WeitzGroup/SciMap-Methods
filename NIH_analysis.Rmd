@@ -27,6 +27,7 @@ library(kableExtra)
 library(knitr)
 library(tidyverse)
 library(stringdist)
+library(readxl)
 
 
 options(scipen=999)
@@ -677,6 +678,42 @@ comp_CD_tab %>%
 
 ```
 
+```{r acp-tab}
+# classify based on ACP typology
+acp_df <- read_xlsx("data/2023-ACP-Typology.xlsx")  %>%
+            mutate(FIPS = str_pad(Fips, 5, pad = "0")) %>%
+            rename(acp_type = 4) %>%
+            select(FIPS, acp_type)
+comp %>%
+# population size
+    left_join(read.csv("data/county_pop.csv") %>%
+                  mutate(FIPS = str_pad(FIPS, 5, pad = "0")) %>%
+                  select(FIPS, pop_2024))  %>%
+    left_join(acp_df) %>%
+    arrange(desc(IDC_econ_loss)) %>%
+# group by urbanicity
+    group_by(acp_type) %>%
+# get values for table
+    summarize(num = n(),
+              static_count = sum(static_IDC_loss >= 100000),
+              commuter_count = sum(IDC_econ_loss >= 100000),
+              total_loss = mean(IDC_econ_loss)/10^6,
+              static_term_count = sum(static_term_loss >= 100000),
+              commuter_term_count = sum(terminated_econ_loss >= 100000),
+              total_term_loss = mean(terminated_econ_loss)/10^6) %>%
+   mutate(total_loss = paste0("$", round(total_loss, digits=2)),
+          total_term_loss = paste0("$", round(total_term_loss, digits=2)),
+          static_count = paste0(static_count, " (", round(static_count/num, digits=2)*100, "%)"),
+          commuter_count = paste0(commuter_count, " (", round(commuter_count/num, digits=2)*100, "%)"),
+          static_term_count = paste0(static_term_count, " (", round(static_term_count/num, digits=2)*100, "%)"),
+          commuter_term_count = paste0(commuter_term_count, " (", round(commuter_term_count/num, digits=2)*100, "%)")) %>%
+  filter(!is.na(acp_type)) %>%
+  arrange(desc(num)) %>%
+  kable(format="latex", booktabs=TRUE) %>%
+  kable_styling(latex_options = "scale_down") %>%
+cat(file="figs/county_acp.tex")
+
+```
 ```{r sens-rho25}
 county_sens <- read.csv("output/NIH_impact_county-sens.csv") %>%
                     mutate(FIPS = str_pad(FIPS, 5, pad = "0")) %>%
