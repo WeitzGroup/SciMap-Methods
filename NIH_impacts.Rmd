@@ -609,7 +609,7 @@ county_commute_NIH_sum_22 <- read.csv("data/state_abbrev.csv") %>%
   select(-state_FIPS) %>%
   filter(FIPS != "0") 
 
-write.csv(county_commute_NIH_sum_22, "output/NIH_impact_county-22.csv", row.names=FALSE)
+write.csv(county_commute_NIH_sum_22, "output/NIH_impact_county_most-recent-flows.csv", row.names=FALSE)
 ```
 
 ```{r rac-wac-output}

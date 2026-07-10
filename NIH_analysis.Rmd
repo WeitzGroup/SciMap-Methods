@@ -28,6 +28,7 @@ library(knitr)
 library(tidyverse)
 library(stringdist)
 library(readxl)
+library(data.table)
 
 
 options(scipen=999)
@@ -119,7 +120,7 @@ comp <- static_loss %>%
   rename(static_IDC_loss = IDC_econ_loss,
          static_term_loss = terminated_econ_loss) %>%
   right_join(commute_NIH_sum) %>%
-  select(FIPS, IDC_econ_loss, IDC_loss, IDC_job_loss, static_IDC_loss, terminated_econ_loss, static_term_loss, county, state) %>%
+  select(FIPS, IDC_econ_loss, IDC_loss, IDC_job_loss, static_IDC_loss, terminated_econ_loss, terminated_loss, static_term_loss, county, state) %>%
   mutate(static_IDC_loss = replace_na(static_IDC_loss, 0),
          static_term_loss = replace_na(static_term_loss, 0)) %>% 
   left_join(urbanicity) %>%
@@ -171,7 +172,7 @@ comp %>% arrange(desc(static_IDC_loss)) %>%
 sum(comp$static_IDC_loss)
 comp %>% filter(IDC_econ_loss < 1) %>% dim()
 comp %>% filter(IDC_econ_loss>100000) %>% dim()
-
+comp %>% filter(IDC_loss>100000) %>% dim()
 
 comp %>% filter(IDC_econ_loss>100000 & static_IDC_loss==0) %>% dim()
 comp_CD %>% filter(IDC_econ_loss > 100000) %>% dim()
@@ -251,6 +252,7 @@ read.csv("data/county_pop.csv") %>%
     right_join(top_term) %>% arrange(desc(static_term_loss))
 
 comp %>% filter(terminated_econ_loss >100000) %>% nrow()
+comp %>% filter(terminated_loss >100000) %>% nrow()
 
 out_loss <- commute_NIH %>% 
                 mutate(DESTINATION = substr(DESTINATION, 1, 5)) %>%
@@ -615,9 +617,9 @@ comp %>%
     summarize(static_count = sum(static_IDC_loss >= 100000),
               commuter_count = sum(IDC_econ_loss >= 100000),
               total_loss = mean(IDC_econ_loss)/10^6,
-              avg_percap_loss = mean(IDC_econ_loss/(pop_2024))*100000/10^6) %>%
+              avg_percap_loss = round(sum(IDC_econ_loss)/sum(pop_2024)*100000, digits=0)) %>%
    mutate(total_loss = paste0("$", round(total_loss, digits=2)),
-         avg_percap_loss = paste0("$", round(avg_percap_loss, digits=2))) %>%
+         avg_percap_loss = paste0("$", prettyNum(avg_percap_loss, big.mark = ",", scientific = FALSE))) %>%
   kable(format="latex", booktabs=TRUE) %>%
   kable_styling(latex_options = "scale_down") %>%
 cat(file="figs/county_urb.tex")
@@ -661,9 +663,9 @@ comp_CD_tab %>%
             static_count = sum(static_IDC_loss >= 100000),
             commuter_count = sum(IDC_econ_loss >= 100000),
             total_loss = mean(IDC_econ_loss)/10^6,
-            avg_percap_loss = mean(IDC_econ_loss/(pop_2024)*100000/10^6)) %>%
+            avg_percap_loss = round(sum(IDC_econ_loss)/sum(pop_2024)*100000, digits=0)) %>%
   mutate(total_loss = paste0("$", round(total_loss, digits=2)),
-         avg_percap_loss = paste0("$", round(avg_percap_loss, digits=2))) %>%
+         avg_percap_loss = paste0("$", prettyNum(avg_percap_loss, big.mark = ",", scientific = FALSE))) %>%
   kable(format="latex", booktabs=TRUE) %>%
   kable_styling(latex_options = "scale_down") %>%
 cat(file="figs/CD_partisanship.tex")
@@ -694,26 +696,31 @@ comp %>%
 # group by urbanicity
     group_by(acp_type) %>%
 # get values for table
-    summarize(num = n(),
+   summarize(pop = sum(pop_2024, na.rm=TRUE),
+              num = n(),
               static_count = sum(static_IDC_loss >= 100000),
               commuter_count = sum(IDC_econ_loss >= 100000),
-              total_loss = mean(IDC_econ_loss)/10^6,
+              total_loss = sum(IDC_econ_loss)/pop*10^5,
               static_term_count = sum(static_term_loss >= 100000),
               commuter_term_count = sum(terminated_econ_loss >= 100000),
-              total_term_loss = mean(terminated_econ_loss)/10^6) %>%
-   mutate(total_loss = paste0("$", round(total_loss, digits=2)),
-          total_term_loss = paste0("$", round(total_term_loss, digits=2)),
+              total_term_loss = sum(terminated_econ_loss)/sum(pop_2024)*10^5) %>%
+   arrange(desc(pop)) %>%
+   mutate(total_loss = round(total_loss, digits=0),
+          total_term_loss = round(total_term_loss, digits=0),
           static_count = paste0(static_count, " (", round(static_count/num, digits=2)*100, "%)"),
           commuter_count = paste0(commuter_count, " (", round(commuter_count/num, digits=2)*100, "%)"),
           static_term_count = paste0(static_term_count, " (", round(static_term_count/num, digits=2)*100, "%)"),
           commuter_term_count = paste0(commuter_term_count, " (", round(commuter_term_count/num, digits=2)*100, "%)")) %>%
+  mutate(pop = prettyNum(pop, big.mark = ",", scientific = FALSE),
+         total_loss = paste0("$", prettyNum(total_loss, big.mark = ",", scientific = FALSE)),
+         total_term_loss = paste0("$", prettyNum(total_term_loss, big.mark = ",", scientific = FALSE))) %>%
   filter(!is.na(acp_type)) %>%
-  arrange(desc(num)) %>%
   kable(format="latex", booktabs=TRUE) %>%
   kable_styling(latex_options = "scale_down") %>%
 cat(file="figs/county_acp.tex")
 
 ```
+
 ```{r sens-rho25}
 county_sens <- read.csv("output/NIH_impact_county-sens.csv") %>%
                     mutate(FIPS = str_pad(FIPS, 5, pad = "0")) %>%
@@ -891,24 +898,228 @@ print(cor(comp_sect$IDC_econ_loss, comp_sect$narrow_IDC_econ_loss)^2)
 ```
 
 ```{r 2022-sens}
-comp_22 <- read.csv("output/NIH_impact_county.csv")
+comp_mr <- read.csv("output/NIH_impact_county.csv")
 
-comp_22 <- read.csv("output/NIH_impact_county-22.csv") %>%
-              rename(IDC_econ_loss_22 = IDC_econ_loss) %>%
-              select(FIPS, IDC_econ_loss_22) %>%
-              right_join(comp_22) %>%
-              filter(! state_code %in% c("MI", "AK", "MS"))
+comp_mr <- read.csv("output/NIH_impact_county_most-recent-flows.csv") %>%
+              rename(IDC_econ_loss_mr = IDC_econ_loss,
+                     terminated_econ_loss_mr = terminated_econ_loss) %>%
+              select(FIPS, IDC_econ_loss_mr, terminated_econ_loss_mr) %>%
+              right_join(comp_mr) %>%
+              mutate(FIPS = str_pad(FIPS, 5, pad = "0")) 
 
-ggplot(comp_22) +
-          geom_point(aes(x=IDC_econ_loss/10^6, y=IDC_econ_loss_22/10^6), size=1, shape=1)+
+comp_mr <- read.csv("data/Ruralurbancontinuumcodes2023.csv") %>%
+                mutate(FIPS = str_pad(FIPS, 5, pad = "0")) %>%
+                filter(Attribute=="RUCC_2023") %>%
+                mutate(urban = ifelse(Value %in% c("1", "2", "3"), TRUE, FALSE)) %>%
+                select(FIPS, urban) %>%
+                distinct()  %>%
+                right_join(comp_mr)
+
+ggplot(comp_mr %>% filter(! state_code %in% c("MI", "AK"))) +
+          geom_point(aes(x=IDC_econ_loss/10^6, y=IDC_econ_loss_mr/10^6), size=1, shape=1)+
           theme_classic()+
           geom_abline(color="red", intercept=0, slope=1)+
-          ylab("Economic Loss with 2022 Commuter Flows ($M)")+
+          ylab("Economic Loss with 2023 Commuter Flows ($M)")+
           xlab("Economic Loss with 2016 Commuter Flows ($M)")
 
-ggsave("figs/supp-comp_22.png", width=4, height=4, dpi=300)
+ggsave("figs/supp-comp_mr.png", width=4, height=4, dpi=300)
 
-print(cor(comp_22$IDC_econ_loss, comp_22$IDC_econ_loss_22, use="complete.obs")^2)
+print(cor(comp_mr$IDC_econ_loss, comp_mr$IDC_econ_loss_mr, use="complete.obs")^2)
+cor(comp_mr$IDC_econ_loss, comp_mr$IDC_econ_loss_mr, method="spearman")
+cor(comp_mr$terminated_econ_loss, comp_mr$terminated_econ_loss_mr, method="spearman")
+
+comp_mr %>%
+  filter(IDC_econ_loss_mr > 10^5) %>%
+  nrow()
+
+comp_mr %>%
+  filter(IDC_econ_loss_mr > 10^5 & IDC_econ_loss < 10^5) %>%
+  nrow()
+
+comp_mr %>%
+  filter(IDC_econ_loss_mr > 10^5 & IDC_econ_loss < 10^5) %>%
+  group_by(state) %>%
+  summarize(frq=n()) %>%
+  arrange(desc(frq))
+
+
+comp_mr %>%
+  filter(IDC_econ_loss_mr < 10^5 & IDC_econ_loss > 10^5) %>%
+  group_by(state) %>%
+  summarize(frq=n()) %>%
+  arrange(desc(frq))
+
+comp_mr %>%
+  filter(terminated_econ_loss_mr > 10^5) %>%
+  nrow()
+
+comp_mr %>%
+  filter(terminated_econ_loss_mr > 10^5 & terminated_econ_loss < 10^5) %>%
+  group_by(urban) %>%
+  summarize(frq=n())
+
+comp_mr %>%
+  filter(terminated_econ_loss_mr < 10^5 & terminated_econ_loss > 10^5) %>%
+  group_by(urban) %>%
+  summarize(frq=n())
+
+
+```
+
+```{r sensitivity-ucla}
+# identify static losses associated with UCLA
+ucla_loss <- read.csv("./output/NIH_clean_fips.csv") %>%
+  mutate(tractid = str_pad(tractid, 11, pad = "0")) %>%
+  filter(org_name == "UNIVERSITY OF CALIFORNIA LOS ANGELES") %>%
+  summarize(tractid = head(tractid,1),
+            IDC_econ_loss = sum(IDC_econ_loss, na.rm=TRUE))
+
+# summarize census tracts associated with UCLA
+ucla_loc_df <- read.csv("data/UCLA_wTRACT.csv") %>%
+  mutate(GEOID = str_pad(GEOID, 11, pad = "0")) 
+
+ucla_loc_df %>%
+  group_by(GEOID) %>% 
+  summarize(frq=n()) %>% 
+  arrange(desc(frq)) %>%
+  print(n=30)
+
+ucla_loc_df %>%
+  group_by(substr(GEOID, 1,5)) %>% 
+  summarize(frq=n()) %>% 
+  arrange(desc(frq)) %>%
+  rename(County = 1)
+
+# prep UCLA commuter flows and calculate associated losses for each county/campus combo
+ucla_sens_loss <- read.csv("data/Tract_work_County_home_UCLApts.csv") %>%
+                      mutate(GEOID = str_pad(GEOID, 11, pad = "0"),
+                             h_county = str_pad(h_county, 5, pad="0")) %>%
+                      select(-X) %>%
+                      distinct() %>%
+                      cbind(IDC_econ_loss = ucla_loss$IDC_econ_loss) %>% 
+                      group_by(GEOID) %>%
+                      mutate(total_commuter = sum(commuters)) %>%
+                      ungroup() %>%
+                      mutate(proportion = commuters/total_commuter) %>%
+                      mutate(campus_IDC_econ_loss = IDC_econ_loss * proportion) %>%
+                      right_join(ucla_loc_df) 
+# append dictionary of county names 
+ucla_sens_loss <- read.csv("data/county_pop.csv") %>%
+                      mutate(h_county = str_pad(FIPS, 5, pad = "0")) %>%
+                      right_join(ucla_sens_loss) %>%
+                      mutate(county = str_replace(county, " County", "")) 
+  
+# identify counties with substantial lines associated with UCLA at main campus
+top_ucla_h_counties <- ucla_sens_loss %>%
+  select(-c(X, ADDRESS)) %>%
+  mutate(county = fct_reorder(county, campus_IDC_econ_loss, .desc = TRUE)) %>%
+  filter(GEOID == ucla_loss$tractid) %>%
+  arrange(desc(proportion)) %>%
+  filter(campus_IDC_econ_loss > 10^5)
+
+ucla_med <- ucla_sens_loss %>%
+  filter(county %in% top_ucla_h_counties$county) %>%
+  group_by(county) %>%
+  summarize(median_loss = median(campus_IDC_econ_loss))
+  
+ucla_sens_loss %>%
+  filter(h_county %in% top_ucla_h_counties$h_county) %>%
+  mutate(county = factor(county, levels = unique(top_ucla_h_counties$county))) %>%
+  ggplot()+
+  geom_histogram(aes(x=campus_IDC_econ_loss/10^6), fill="white", color="black") +
+  geom_vline(data = top_ucla_h_counties, aes(xintercept = campus_IDC_econ_loss/10^6), color="red")+
+  geom_vline(data = ucla_med, aes(xintercept = median_loss/10^6), color="blue", linetype="twodash")+
+  facet_wrap(~county, scale="free")+
+  theme_classic()+
+  xlab("Economic Loss ($M)")+
+  ggtitle("UCLA Multicampus Sensitivity Analysis")
+
+ggsave("figs/ucla-sens.png", width=8, height=8, dpi=300)
+
+```
+
+```{r sensitivity-jhu}
+# identify static losses associated with UCLA
+jhu_loss <- read.csv("./output/NIH_clean_fips.csv") %>%
+  mutate(tractid = str_pad(tractid, 11, pad = "0")) %>%
+  filter(org_name == "JOHNS HOPKINS UNIVERSITY") %>%
+  summarize(tractid = head(tractid,1),
+            IDC_econ_loss = sum(IDC_econ_loss, na.rm=TRUE))
+
+# summarize census tracts associated with UCLA
+jhu_loc_df <- read.csv("data/JHU_wTRACT.csv") %>%
+  mutate(GEOID = str_pad(GEOID, 11, pad = "0")) %>%
+  select(GEOID, Name) %>%
+  rbind("GEOID" = jhu_loss$tractid, "Name" = "Main Campus")
+
+jhu_loc_df %>%
+  group_by(GEOID) %>% 
+  summarize(frq=n()) %>% 
+  arrange(desc(frq)) %>%
+  print(n=30)
+
+jhu_loc_df %>%
+  group_by(substr(GEOID, 1,5)) %>% 
+  summarize(frq=n()) %>% 
+  arrange(desc(frq)) %>%
+  rename(County = 1)
+
+# extract JHU commuter flows for main campus (not included below)
+main_jhu_commuter <- fread("https://osf.io/8tq67/download") %>% 
+  mutate(GEOID = str_pad(W_geocode, 11, pad = "0"),
+         h_county = str_pad(H_geocode, 5, pad = "0")) %>%
+  rename(commuters = Commuters) %>%
+   select(GEOID, h_county, commuters) %>%
+  filter(GEOID == jhu_loss$tractid)
+
+# prep JHU commuter flows and calculate associated losses for each county/campus combo
+jhu_sens_loss <- read.csv("data/Tract_work_County_home_JHUpts.csv") %>%
+                      mutate(GEOID = str_pad(GEOID, 11, pad = "0"),
+                             h_county = str_pad(h_county, 5, pad="0")) %>%
+                      select(-X) %>%
+                      rbind(main_jhu_commuter) %>%
+                      distinct() %>%
+                      cbind(IDC_econ_loss = jhu_loss$IDC_econ_loss) %>% 
+                      group_by(GEOID) %>%
+                      mutate(total_commuter = sum(commuters)) %>%
+                      ungroup() %>%
+                      mutate(proportion = commuters/total_commuter) %>%
+                      mutate(campus_IDC_econ_loss = IDC_econ_loss * proportion) %>%
+                      right_join(jhu_loc_df)
+
+# append dictionary of county names 
+jhu_sens_loss <- read.csv("data/county_pop.csv") %>%
+                      mutate(h_county = str_pad(FIPS, 5, pad = "0")) %>%
+                      right_join(jhu_sens_loss) %>%
+                      mutate(county = str_replace(county, " County", "")) 
+  
+# identify counties with substantial lines associated with UCLA at main campus
+top_jhu_h_counties <- jhu_sens_loss %>%
+  select(-c(Name)) %>%
+  mutate(county = fct_reorder(county, campus_IDC_econ_loss, .desc = TRUE)) %>%
+  filter(GEOID == jhu_loss$tractid) %>%
+  arrange(desc(proportion)) %>%
+  filter(campus_IDC_econ_loss > 10^5)
+
+jhu_med <- jhu_sens_loss %>%
+  filter(county %in% top_jhu_h_counties$county) %>%
+  group_by(county) %>%
+  summarize(median_loss = median(campus_IDC_econ_loss))
+  
+jhu_sens_loss %>%
+  filter(h_county %in% top_jhu_h_counties$h_county) %>%
+  mutate(county = factor(county, levels = unique(top_jhu_h_counties$county))) %>%
+  ggplot()+
+  geom_histogram(aes(x=campus_IDC_econ_loss/10^6), fill="white", color="black") +
+  geom_vline(data = top_jhu_h_counties, aes(xintercept = campus_IDC_econ_loss/10^6), color="red")+
+  geom_vline(data = jhu_med, aes(xintercept = median_loss/10^6), color="blue", linetype="twodash")+
+  facet_wrap(~county, scale="free")+
+  theme_classic()+
+  xlab("Economic Loss ($M)")+
+  ggtitle("JHU Multicampus Sensitivity Analysis")+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+
+ggsave("figs/jhu-sens.png", width=10, height=12, dpi=300)
 
 ```
 

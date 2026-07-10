@@ -24,13 +24,20 @@ script should take 1-5 minutes to run.
 
 ```
 ├── data/                                   # Raw data
+│   ├── 2023-ACP-Typology.csv
 │   ├── CD_pop2024.csv
+│   ├── county_gdp2024.csv
+│   ├── county_pop.csv
+│   ├── geoid_dictionary_July4.csv
+│   ├── JHU_wTract.csv
+│   ├── UCLA_wTract.csv
+│   ├── Tract_work_County_home_JHUpts.csv
+│   ├── Tract_work_County_home_UCLApts.csv
+│   ├── JT00_mostrecent
+│   ├── org_names_corrected.csv
 │   ├── RAC_countyAll.csv
 │   ├── Ruralurbancontinuumcodes2023.csv    
 │   ├── WAC_tract.csv
-│   ├── county_pop.csv
-│   ├── geoid_dictionary_July4.csv
-│   ├── org_names_corrected.csv
 │   ├── repeated_orgs.csv
 │   ├── state-multiplier-urm.csv
 │   ├── state_abbrev.csv
@@ -53,6 +60,8 @@ script should take 1-5 minutes to run.
 │   ├── comp_natlmult_IDC_FIPS.csv
 │   ├── county_commute_NIH_inst.csv
 │   ├── county_urb.tex
+│   ├── recent_flows.csv
+│   ├── raw_loss.csv
 │   ├── static_loss_cong.csv
 │   ├── static_loss_county.csv
 │   ├── static_vs_commuter-CD.csv
@@ -66,6 +75,8 @@ script should take 1-5 minutes to run.
 
 ## Data
 
+-   2023-ACP-Typology - county FIPS and ACP typology category
+-   county_gdp2024 - GDP at the county level
 -   county_pop - county FIPS, state name, county name, and population
     size for each county (currently used to match county FIPS to name
     and state)
@@ -100,6 +111,8 @@ script should take 1-5 minutes to run.
     generated at state level (from URM)
 -   us_representatives_119th_congress - representative name and party
     affiliation by district
+-   JHU/UCLA_wTract - tract assignment for each satellite location for JHU and UCLA
+-   Tract_work_County_home_JHU/UCLApts - tract-to-county flows for each tract containing a satellite JHU or UCLA location
 
 ## Output
 
@@ -169,7 +182,7 @@ static versus commuter estimates for counties and districts
 (static_vs_commuter, static_vs_commuter-CD); and sensitivity analyses of
 county-level estimates using state-specific economic multipliers or
 varying commuter influence $\rho$ (NIH_impact_county-diffmult,
-NIH_impact_county-sens).
+NIH_impact_county-sens), raw losses estimated without applying a multiplier (raw_loss), and economic losses estimate using the most recent commuter flows (recent_flows).
 
 ## Figs
 
@@ -178,6 +191,4 @@ institutions located within a given focal county (fig1-points, for
 Figure 1), economic losses in surrounding counties originating from a
 given focal county (fig1-vals, for Figure 1), the pdf output of Figure
 S2 (figs2), the pdf output of Figure 3 (fig3), a latex intermediate for
-Table 1, the pdf output of Figure S4 (fig-supp-rho25), the pdf output of
-Figure S5 (fig-supp-varyrho), and the histogram for Figure S6
-(supp-state_mult_hist).
+Table 1, and supplemental outputs excluding economic loss maps.
