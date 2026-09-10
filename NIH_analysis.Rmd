@@ -925,8 +925,13 @@ ggplot(comp_mr %>% filter(! state_code %in% c("MI", "AK"))) +
 ggsave("figs/supp-comp_mr.png", width=4, height=4, dpi=300)
 
 print(cor(comp_mr$IDC_econ_loss, comp_mr$IDC_econ_loss_mr, use="complete.obs")^2)
+
 cor(comp_mr$IDC_econ_loss, comp_mr$IDC_econ_loss_mr, method="spearman")
 cor(comp_mr$terminated_econ_loss, comp_mr$terminated_econ_loss_mr, method="spearman")
+
+# number of observations
+sum(!is.na(comp_mr$IDC_econ_loss+comp_mr$IDC_econ_loss_mr))
+sum(!is.na(comp_mr$terminated_econ_loss+comp_mr$terminated_econ_loss_mr))
 
 comp_mr %>%
   filter(IDC_econ_loss_mr > 10^5) %>%
@@ -1129,37 +1134,58 @@ county_commute_NIH_sum <- read.csv("output/NIH_impact_county.csv") %>%
 
 p1 <- read.csv("data/county_gdp_2024.csv") %>%
     mutate(FIPS = str_pad(FIPS, 5, pad = "0")) %>%
+  # note the original csv gives GDP in thousands of dollars
+    mutate(gdp_2024 = 1000 * gdp_2024) %>%
     select(FIPS, gdp_2024) %>%
     left_join(county_commute_NIH_sum) %>%
   ggplot()+
   geom_point(aes(x=gdp_2024, y=IDC_econ_loss), shape=1, alpha=.5)+
-  scale_y_log10(breaks=c(100, 10^3, 10^4, 10^5, 10^6, 10^7, 10^8),
-                labels=c(100, "1K", "10K", "100K", "1M", "10M", "100M"),
-                limits=c(1000, 600*10^6))+
-  scale_x_log10(breaks=c(100, 10^3, 10^4, 10^5, 10^6, 10^7, 10^8),
-                labels=c(100, "1K", "10K", "100K", "1M", "10M", "100M"),
-                limits=c(1000, 600*10^6))+
+  scale_y_log10(breaks=c(100, 10^3, 10^4, 10^5, 10^6, 10^7, 10^8, 10^9, 10^10, 10^11, 10^12),
+                labels=c(100, "1K", "10K", "100K", "1M", "10M", "100M", "1B", "10B", "100B", "1T"),
+                limits=c(1000, 6*10^12))+
+  scale_x_log10(breaks=c(100, 10^3, 10^4, 10^5, 10^6, 10^7, 10^8, 10^9, 10^10, 10^11, 10^12),
+                labels=c(100, "1K", "10K", "100K", "1M", "10M", "100M", "1B", "10B", "100B","1T"),
+                limits=c(1000, 6*10^12))+
   theme_classic()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
   ylab("IDC Economic Loss ($)")+
   xlab("GDP ($)")
 
 
 p2 <- read.csv("data/county_gdp_2024.csv") %>%
     mutate(FIPS = str_pad(FIPS, 5, pad = "0")) %>%
+    # note the original csv gives GDP in thousands of dollars
+    mutate(gdp_2024 = 1000 * gdp_2024) %>%
     select(FIPS, gdp_2024) %>%
     left_join(county_commute_NIH_sum) %>%
   ggplot()+
   geom_point(aes(x=gdp_2024, y=terminated_econ_loss), shape=1, alpha=.5)+
-  scale_y_log10(breaks=c(100, 10^3, 10^4, 10^5, 10^6, 10^7, 10^8),
-                labels=c(100, "1K", "10K", "100K", "1M", "10M", "100M"),
-                limits=c(1000, 600*10^6))+
-  scale_x_log10(breaks=c(100, 10^3, 10^4, 10^5, 10^6, 10^7, 10^8),
-                labels=c(100, "1K", "10K", "100K", "1M", "10M", "100M"),
-                limits=c(1000, 600*10^6))+
+  scale_y_log10(breaks=c(100, 10^3, 10^4, 10^5, 10^6, 10^7, 10^8, 10^9, 10^10, 10^11, 10^12),
+                labels=c(100, "1K", "10K", "100K", "1M", "10M", "100M", "1B", "10B", "100B", "1T"),
+                limits=c(1000, 6*10^12))+
+  scale_x_log10(breaks=c(100, 10^3, 10^4, 10^5, 10^6, 10^7, 10^8, 10^9, 10^10, 10^11, 10^12),
+                labels=c(100, "1K", "10K", "100K", "1M", "10M", "100M", "1B", "10B", "100B","1T"),
+                limits=c(1000, 6*10^12))+
   theme_classic()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
   ylab("Terminated Economic Loss ($)")+
   xlab("GDP ($)")
 
 plot_grid(p1, p2)
 ggsave("figs/gdp-v-loss.png", width=8, height=4, dpi=300)
+
+gdp_ratio <- read.csv("data/county_gdp_2024.csv") %>%
+    mutate(FIPS = str_pad(FIPS, 5, pad = "0")) %>%
+  # note the original csv gives GDP in thousands of dollars
+    mutate(gdp_2024 = 1000 * gdp_2024) %>%
+    select(FIPS, gdp_2024) %>%
+    left_join(county_commute_NIH_sum) %>%
+    mutate(ratio = IDC_econ_loss/gdp_2024) 
+
+median(gdp_ratio$ratio, na.rm=TRUE)
+
+gdp_ratio %>%
+  slice_max(ratio) %>%
+  select(county, ratio)
+
 ```
