@@ -27,7 +27,6 @@ library(kableExtra)
 library(knitr)
 library(tidyverse)
 library(stringdist)
-library(readxl)
 library(data.table)
 
 

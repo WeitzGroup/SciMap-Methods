@@ -19,7 +19,7 @@ Input data used in the analysis are in the data folder, outputs csvs are
 in the output folder, and output figures are in the figs folder. More
 detailed descriptions follow. Code developed for R version 4.4.1. Each
 script should take 1-5 minutes to run. NIH_impacts.Rmd should be run prior
-to running NIH_analysis.Rmd.
+to NIH_analysis.Rmd.
 
 ## Project Structure
 
@@ -27,18 +27,18 @@ to running NIH_analysis.Rmd.
 ├── data/                                   # Raw data
 │   ├── 2023-ACP-Typology.csv
 │   ├── CD_pop2024.csv
+│   ├── JHU_wTract.csv
+│   ├── JT00_mostrecent
+│   ├── RAC_countyAll.csv
+│   ├── Ruralurbancontinuumcodes2023.csv
+│   ├── Tract_work_County_home_JHUpts.csv
+│   ├── Tract_work_County_home_UCLApts.csv
+│   ├── UCLA_wTract.csv
+│   ├── WAC_tract.csv
 │   ├── county_gdp2024.csv
 │   ├── county_pop.csv
 │   ├── geoid_dictionary_July4.csv
-│   ├── JHU_wTract.csv
-│   ├── UCLA_wTract.csv
-│   ├── Tract_work_County_home_JHUpts.csv
-│   ├── Tract_work_County_home_UCLApts.csv
-│   ├── JT00_mostrecent
 │   ├── org_names_corrected.csv
-│   ├── RAC_countyAll.csv
-│   ├── Ruralurbancontinuumcodes2023.csv    
-│   ├── WAC_tract.csv
 │   ├── repeated_orgs.csv
 │   ├── state-multiplier-urm.csv
 │   ├── state_abbrev.csv
@@ -56,12 +56,12 @@ to running NIH_analysis.Rmd.
 │   ├── NIH_impact_county-sens.csv
 │   ├── NIH_impact_county.csv
 │   ├── NIH_impact_county_broad.csv
+│   ├── NIH_impact_county_most-recent-flows.csv
 │   ├── NIH_impact_county_narrow.csv
 │   ├── NIH_impact_state.csv
 │   ├── comp_natlmult_IDC_FIPS.csv
 │   ├── county_commute_NIH_inst.csv
 │   ├── county_urb.tex
-│   ├── recent_flows.csv
 │   ├── raw_loss.csv
 │   ├── static_loss_cong.csv
 │   ├── static_loss_county.csv
@@ -193,3 +193,21 @@ Figure 1), economic losses in surrounding counties originating from a
 given focal county (fig1-vals, for Figure 1), the pdf output of Figure
 S2 (figs2), the pdf output of Figure 3 (fig3), a latex intermediate for
 Table 1, and supplemental outputs excluding economic loss maps.
+
+## Package versions
+
+The versions of each package used in NIH_impacts.Rmd and NIH_analysis.Rmd are:
+
+tidyverse: version `r packageVersion("tidyverse")`
+readxl: version `r packageVersion("readxl")`
+sf: version `r packageVersion("sf")`
+magrittr: version `r packageVersion("magrittr")`
+data.table: version `r packageVersion("data.table")`
+cowplot version: `r packageVersion("cowplot")`
+ggpp: version `r packageVersion("ggpp")`
+scales: version `r packageVersion("scales")`
+ggpubr: version `r packageVersion("ggpubr")`
+kableExtra: version `r packageVersion("kableExtra")`
+knitr: version `r packageVersion("knitr")`
+stringdist: version `r packageVersion("stringdist")`
+
