@@ -7,8 +7,8 @@ editor_options:
 # SciMap-Methods
 
 Code to accompany the manuscript "Economic Loss due to Health Funding
-Cuts as Distributed Across Geospatial Units" bv Mallory J Harris, Alyssa
-H Sinclair, Clio Andris, and Joshua S Weitz.
+Cuts as Distributed Across Geospatial Units" by Mallory J Harris, Alyssa
+H Sinclair, Elena K Parkerson, Clio Andris, and Joshua S Weitz.
 
 The two scripts used to conduct all analyses NIH_impacts.Rmd (estimate
 county and district-level economic losses from IDC cap and terminated
@@ -18,7 +18,8 @@ results reported in the manuscript).
 Input data used in the analysis are in the data folder, outputs csvs are
 in the output folder, and output figures are in the figs folder. More
 detailed descriptions follow. Code developed for R version 4.4.1. Each
-script should take 1-5 minutes to run.
+script should take 1-5 minutes to run. NIH_impacts.Rmd should be run prior
+to running NIH_analysis.Rmd.
 
 ## Project Structure
 

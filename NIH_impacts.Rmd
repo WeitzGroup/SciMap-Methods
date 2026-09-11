@@ -386,7 +386,7 @@ county_commute_NIH <- merge(commute, term_sum_tract %>% select(-FIPS), by.x = "D
                   merge(NIH_sum_tract, by.x = "DESTINATION", by.y = "tractid", all.x = TRUE)
 
 #replace all NA values with zeros
-county_commute_NIH <- mutate_all(county_commute_NIH , funs(replace(., is.na(.), 0)))
+county_commute_NIH[is.na(county_commute_NIH)] <- 0
 
 write.csv(county_commute_NIH, "output/county_commute_NIH.csv", row.names=FALSE)
 
@@ -401,8 +401,8 @@ county_commute_NIH_sum <- county_commute_NIH %>%
          combined_econ_loss = terminated_econ_loss + IDC_econ_loss - overlap_econ_loss,
          combined_job_loss = terminated_job_loss + IDC_job_loss - overlap_job_loss,
          combined_loss_noself = terminated_loss_noself + IDC_loss - overlap_loss_noself,
-         combined_econ_loss = terminated_econ_loss_noself + IDC_econ_loss - overlap_econ_loss_noself,
-         combined_job_loss = terminated_job_loss_noself + IDC_job_loss - overlap_job_loss_noself) %>%
+         combined_econ_loss_noself = terminated_econ_loss_noself + IDC_econ_loss - overlap_econ_loss_noself,
+         combined_job_loss_noself = terminated_job_loss_noself + IDC_job_loss - overlap_job_loss_noself) %>%
   mutate(across(starts_with(c("terminated", "IDC", "grant", "combined")), ~ log(.x + 1), .names =  "{.col}_log"))
 
 # read in state FIPS to name dictionary
@@ -445,7 +445,9 @@ NIH_clean_fips %>%
 county_commute_NIH_inst <- merge(commute, IDC_inst, by.x = "DESTINATION", by.y = "tractid", all.x = TRUE)
 
 #replace all NA values with zeros
-county_commute_NIH_inst <- mutate_all(county_commute_NIH_inst , funs(replace(., is.na(.), 0))) %>%
+county_commute_NIH_inst[is.na(county_commute_NIH_inst)] <- 0
+
+county_commute_NIH_inst <- county_commute_NIH_inst %>%
   mutate(across(starts_with(c("IDC")), ~ . * proportion)) %>%
   rename(FIPS = ORIGIN) %>%
   group_by(FIPS) %>%
@@ -482,7 +484,7 @@ write.csv(county_varystatic, "output/NIH_impact_county-sens.csv", row.names=FALS
 commute_raw_ctc <- fread("https://osf.io/8tq67/download") %>% 
   mutate(DESTINATION = str_pad(W_geocode, 11, pad = "0"),
          ORIGIN = str_pad(H_geocode, 5, pad = "0")) %>%
-  mutate(DESTINATION = substr(1, 5, DESTINATION))
+  mutate(DESTINATION = substr(DESTINATION, 1, 5))
 
 # calculate proportion weights
 commute_ctc <- commute_raw_ctc %>% 
@@ -513,8 +515,8 @@ county_commute_NIH_ctc_sum <- county_commute_NIH_ctc %>%
          combined_econ_loss = terminated_econ_loss + IDC_econ_loss - overlap_econ_loss,
          combined_job_loss = terminated_job_loss + IDC_job_loss - overlap_job_loss,
          combined_loss_noself = terminated_loss_noself + IDC_loss - overlap_loss_noself,
-         combined_econ_loss = terminated_econ_loss_noself + IDC_econ_loss - overlap_econ_loss_noself,
-         combined_job_loss = terminated_job_loss_noself + IDC_job_loss - overlap_job_loss_noself) %>%
+         combined_econ_loss_noself = terminated_econ_loss_noself + IDC_econ_loss - overlap_econ_loss_noself,
+         combined_job_loss_noself = terminated_job_loss_noself + IDC_job_loss - overlap_job_loss_noself) %>%
   mutate(across(starts_with(c("terminated", "IDC", "grant", "combined")), ~ log(.x + 1), .names =  "{.col}_log"))
 
 write.csv(county_commute_NIH_ctc_sum, "output/NIH_impact_county-ctc.csv", row.names=FALSE)
@@ -542,8 +544,8 @@ diff_mult_county <-  county_commute_NIH_diffmult %>%
          combined_econ_loss = terminated_econ_loss + IDC_econ_loss - overlap_econ_loss,
          combined_job_loss = terminated_job_loss + IDC_job_loss - overlap_job_loss,
          combined_loss_noself = terminated_loss_noself + IDC_loss - overlap_loss_noself,
-         combined_econ_loss = terminated_econ_loss_noself + IDC_econ_loss - overlap_econ_loss_noself,
-         combined_job_loss = terminated_job_loss_noself + IDC_job_loss - overlap_job_loss_noself) %>%
+         combined_econ_loss_noself = terminated_econ_loss_noself + IDC_econ_loss - overlap_econ_loss_noself,
+         combined_job_loss_noself = terminated_job_loss_noself + IDC_job_loss - overlap_job_loss_noself) %>%
   mutate(across(starts_with(c("terminated", "IDC", "grant", "combined")), ~ log(.x + 1), .names =  "{.col}_log"))
 
 print(nrow(diff_mult_county))
@@ -555,7 +557,7 @@ write.csv(diff_mult_county, "output/NIH_impact_county-natlmult.csv", row.names=F
 
 
 ```{r 2022-flows}
-commute_raw_22 <- read_csv("data/JT00_mostrecent") %>% head()
+commute_raw_22 <- read_csv("data/JT00_mostrecent") %>%
   mutate(DESTINATION = str_pad(w_tract, 11, pad = "0"),
          ORIGIN = str_pad(h_county, 5, pad = "0"))
 
@@ -578,7 +580,7 @@ county_commute_NIH_22 <- merge(commute_22, term_sum_tract %>% select(-FIPS), by.
                   merge(NIH_sum_tract, by.x = "DESTINATION", by.y = "tractid", all.x = TRUE)
 
 #replace all NA values with zeros
-county_commute_NIH_22 <- mutate_all(county_commute_NIH_22 , funs(replace(., is.na(.), 0)))
+county_commute_NIH_22[is.na(county_commute_NIH_22)] <- 0
 
 county_commute_NIH_sum_22 <- county_commute_NIH_22 %>%
   mutate(across(starts_with(c("terminated", "IDC", "grant", "overlap")), ~ . * proportion)) %>%
@@ -591,8 +593,8 @@ county_commute_NIH_sum_22 <- county_commute_NIH_22 %>%
          combined_econ_loss = terminated_econ_loss + IDC_econ_loss - overlap_econ_loss,
          combined_job_loss = terminated_job_loss + IDC_job_loss - overlap_job_loss,
          combined_loss_noself = terminated_loss_noself + IDC_loss - overlap_loss_noself,
-         combined_econ_loss = terminated_econ_loss_noself + IDC_econ_loss - overlap_econ_loss_noself,
-         combined_job_loss = terminated_job_loss_noself + IDC_job_loss - overlap_job_loss_noself) %>%
+         combined_econ_loss_noself = terminated_econ_loss_noself + IDC_econ_loss - overlap_econ_loss_noself,
+         combined_job_loss_noself = terminated_job_loss_noself + IDC_job_loss - overlap_job_loss_noself) %>%
   mutate(across(starts_with(c("terminated", "IDC", "grant", "combined")), ~ log(.x + 1), .names =  "{.col}_log"))
 
 
@@ -618,7 +620,7 @@ rac_df <- read.csv("data/RAC_countyAll.csv") %>%
           mutate(ORIGIN = str_pad(HomeCounty, 5, pad = "0")) %>%
           mutate(broad_sum_rac = sum.CNS03.+sum.CNS04.+sum.CNS05.+sum.CNS07.+
                              sum.CNS08.+sum.CNS12.+sum.CNS13.+sum.CNS14.+
-                             sum.CNS16.,
+                             sum.CNS16. + sum.CNS20.,
                  narrow_sum_rac = sum.CNS12.+sum.CNS13.+sum.CNS14.+sum.CNS16.) %>%
           mutate(broad_prop_rac = broad_sum_rac/AllCommutes,
                  narrow_prop_rac = narrow_sum_rac/AllCommutes) %>%
@@ -632,7 +634,7 @@ wac_df <- read.csv("data/WAC_tractAll.csv") %>%
           mutate(DESTINATION = str_pad(WorkTract, 11, pad = "0")) %>%
           mutate(broad_sum_wac = sum.CNS03.+sum.CNS04.+sum.CNS05.+sum.CNS07.+
                              sum.CNS08.+sum.CNS12.+sum.CNS13.+sum.CNS14.+
-                             sum.CNS16.,
+                             sum.CNS16. + sum.CNS20.,
                  narrow_sum_wac = sum.CNS12.+sum.CNS13.+sum.CNS14.+sum.CNS16.) %>%
           mutate(broad_prop_wac = broad_sum_wac/AllCommutes,
                  narrow_prop_wac = narrow_sum_wac/AllCommutes) %>%
@@ -674,7 +676,8 @@ county_commute_NIH_sect <- merge(commute_sect, term_sum_tract, by.x = "DESTINATI
                   merge(NIH_sum_tract, by.x = "DESTINATION", by.y = "tractid", all.x = TRUE)
 
 #replace all NA values with zeros
-county_commute_NIH_sect <- mutate_all(county_commute_NIH_sect , funs(replace(., is.na(.), 0)))
+county_commute_NIH_sect[is.na(county_commute_NIH_sect)] <- 0
+
 
 county_commute_NIH_sum_broad <- county_commute_NIH_sect %>%
   select(-FIPS) %>%
@@ -688,8 +691,8 @@ county_commute_NIH_sum_broad <- county_commute_NIH_sect %>%
          combined_econ_loss = terminated_econ_loss + IDC_econ_loss - overlap_econ_loss,
          combined_job_loss = terminated_job_loss + IDC_job_loss - overlap_job_loss,
          combined_loss_noself = terminated_loss_noself + IDC_loss - overlap_loss_noself,
-         combined_econ_loss = terminated_econ_loss_noself + IDC_econ_loss - overlap_econ_loss_noself,
-         combined_job_loss = terminated_job_loss_noself + IDC_job_loss - overlap_job_loss_noself) %>%
+         combined_econ_loss_noself = terminated_econ_loss_noself + IDC_econ_loss - overlap_econ_loss_noself,
+         combined_job_loss_noself = terminated_job_loss_noself + IDC_job_loss - overlap_job_loss_noself) %>%
   mutate(across(starts_with(c("terminated", "IDC", "grant", "combined")), ~ log(.x + 1), .names =  "{.col}_log"))
 
 #add state name
@@ -719,8 +722,8 @@ county_commute_NIH_sum_narrow <- county_commute_NIH_sect %>%
          combined_econ_loss = terminated_econ_loss + IDC_econ_loss - overlap_econ_loss,
          combined_job_loss = terminated_job_loss + IDC_job_loss - overlap_job_loss,
          combined_loss_noself = terminated_loss_noself + IDC_loss - overlap_loss_noself,
-         combined_econ_loss = terminated_econ_loss_noself + IDC_econ_loss - overlap_econ_loss_noself,
-         combined_job_loss = terminated_job_loss_noself + IDC_job_loss - overlap_job_loss_noself) %>%
+         combined_econ_loss_noself = terminated_econ_loss_noself + IDC_econ_loss - overlap_econ_loss_noself,
+         combined_job_loss_noself = terminated_job_loss_noself + IDC_job_loss - overlap_job_loss_noself) %>%
   mutate(across(starts_with(c("terminated", "IDC", "grant", "combined")), ~ log(.x + 1), .names =  "{.col}_log"))
 
 #add state name
@@ -808,7 +811,7 @@ cong_commute_NIH <- merge(cong_commute, term_sum_tract, by.x = "Cong_DESTINATION
 
 ```{r District Calculations}
 #replace all NA values with zeros
-cong_commute_NIH <- mutate_all(cong_commute_NIH, funs(replace(., is.na(.), 0)))
+cong_commute_NIH[is.na(cong_commute_NIH)] <- 0
 
 #use commuter flows (e.g., proportion of people who work in district X but live in district Y) to weight the impact of NIH funding
 cong_commute_NIH_sum <- cong_commute_NIH %>%
@@ -822,8 +825,8 @@ cong_commute_NIH_sum <- cong_commute_NIH %>%
        combined_econ_loss = terminated_econ_loss + IDC_econ_loss - overlap_econ_loss,
        combined_job_loss = terminated_job_loss + IDC_job_loss - overlap_job_loss,
        combined_loss_noself = terminated_loss_noself + IDC_loss - overlap_loss_noself,
-       combined_econ_loss = terminated_econ_loss_noself + IDC_econ_loss - overlap_econ_loss_noself,
-       combined_job_loss = terminated_job_loss_noself + IDC_job_loss - overlap_job_loss_noself) %>%
+       combined_econ_loss_noself = terminated_econ_loss_noself + IDC_econ_loss - overlap_econ_loss_noself,
+       combined_job_loss_noself = terminated_job_loss_noself + IDC_job_loss - overlap_job_loss_noself) %>%
   mutate(across(starts_with(c("terminated", "IDC", "grant", "combined")), ~ log(.x + 1), .names =  "{.col}_log"))
 
 #add in rep names

@@ -58,7 +58,7 @@ if(file.exists("output/county_commute_NIH.csv")){
 county_commute <- county_commute %>%
   mutate(DESTINATION = str_pad(DESTINATION, 5, pad = "0")) %>%
   mutate(ORIGIN = str_pad(ORIGIN, 5, pad = "0")) %>%
-  filter(startsWith(DESTINATION, c("13089", "48201", "42003"))) %>%
+  filter(substr(DESTINATION, 1, 5) %in% c("13089", "48201", "42003")) %>%
   mutate(IDC_econ_loss = proportion*IDC_econ_loss) %>%
   mutate(DESTINATION = substr(DESTINATION, 0, 5)) %>%
   filter(IDC_econ_loss != 0) %>%
@@ -110,7 +110,7 @@ term_tab_orig <- read_csv("https://osf.io/txmjw/download") %>%
   mutate(org_name = toupper(org_name)) %>%
   mutate(award_remaining_noself = ifelse(cancellation_source == "Self reported", 0 , award_remaining)) %>%
   # exclude reinstated grants
-  filter(is.na(reinstated_est_date)) %>%
+  filter(is.na(reinstated_est_date) & is.na(unfrozen_date)) %>%
     mutate(award_remaining = ifelse(award_remaining <0 , 0 , award_remaining),
            award_remaining_noself = ifelse(award_remaining_noself <0 , 0 , award_remaining_noself)) 
 
@@ -404,7 +404,7 @@ plot_grid(fig3a,
                      "D. Economic Losses from Terminated/Frozen Grants \nin Counties with Local Affected Organizations"),
           hjust=0, label_size=11, align="h")
 
-ggsave(file="figs/fig3.pdf", height=8, width=8)
+ggsave(file="figs/fig3.pdf", height=8, width=8, create.dir = TRUE)
 
 
 ```
@@ -980,7 +980,7 @@ ucla_loss <- read.csv("./output/NIH_clean_fips.csv") %>%
             IDC_econ_loss = sum(IDC_econ_loss, na.rm=TRUE))
 
 # summarize census tracts associated with UCLA
-ucla_loc_df <- read.csv("data/UCLA_wTRACT.csv") %>%
+ucla_loc_df <- read.csv("data/UCLA_wTract.csv") %>%
   mutate(GEOID = str_pad(GEOID, 11, pad = "0")) 
 
 ucla_loc_df %>%
@@ -1020,7 +1020,7 @@ top_ucla_h_counties <- ucla_sens_loss %>%
   mutate(county = fct_reorder(county, campus_IDC_econ_loss, .desc = TRUE)) %>%
   filter(GEOID == ucla_loss$tractid) %>%
   arrange(desc(proportion)) %>%
-  filter(campus_IDC_econ_loss > 10^5)
+  filter(commuters >= 10)
 
 ucla_med <- ucla_sens_loss %>%
   filter(county %in% top_ucla_h_counties$county) %>%
@@ -1052,7 +1052,7 @@ jhu_loss <- read.csv("./output/NIH_clean_fips.csv") %>%
             IDC_econ_loss = sum(IDC_econ_loss, na.rm=TRUE))
 
 # summarize census tracts associated with UCLA
-jhu_loc_df <- read.csv("data/JHU_wTRACT.csv") %>%
+jhu_loc_df <- read.csv("data/JHU_wTract.csv") %>%
   mutate(GEOID = str_pad(GEOID, 11, pad = "0")) %>%
   select(GEOID, Name) %>%
   rbind("GEOID" = jhu_loss$tractid, "Name" = "Main Campus")
@@ -1098,13 +1098,13 @@ jhu_sens_loss <- read.csv("data/county_pop.csv") %>%
                       right_join(jhu_sens_loss) %>%
                       mutate(county = str_replace(county, " County", "")) 
   
-# identify counties with substantial lines associated with UCLA at main campus
+# identify counties with substantial lines associated with JHU at main campus
 top_jhu_h_counties <- jhu_sens_loss %>%
   select(-c(Name)) %>%
   mutate(county = fct_reorder(county, campus_IDC_econ_loss, .desc = TRUE)) %>%
   filter(GEOID == jhu_loss$tractid) %>%
   arrange(desc(proportion)) %>%
-  filter(campus_IDC_econ_loss > 10^5)
+  filter(commuters >= 10)
 
 jhu_med <- jhu_sens_loss %>%
   filter(county %in% top_jhu_h_counties$county) %>%
@@ -1133,6 +1133,8 @@ county_commute_NIH_sum <- read.csv("output/NIH_impact_county.csv") %>%
     mutate(FIPS = str_pad(FIPS, 5, pad = "0"))
 
 p1 <- read.csv("data/county_gdp_2024.csv") %>%
+  mutate(FIPS = trimws(FIPS), 
+         FIPS = str_pad(FIPS, 5, pad = "0")) %>%
     mutate(FIPS = str_pad(FIPS, 5, pad = "0")) %>%
   # note the original csv gives GDP in thousands of dollars
     mutate(gdp_2024 = 1000 * gdp_2024) %>%
