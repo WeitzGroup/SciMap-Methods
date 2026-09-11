@@ -17,7 +17,7 @@ results reported in the manuscript).
 
 Input data used in the analysis are in the data folder, outputs csvs are
 in the output folder, and output figures are in the figs folder. More
-detailed descriptions follow. Code developed for R version 4.4.1. Each
+detailed descriptions follow. Code developed for R version 4.5.1. Each
 script should take 1-5 minutes to run. NIH_impacts.Rmd should be run prior
 to NIH_analysis.Rmd.
 
