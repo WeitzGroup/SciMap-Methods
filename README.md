@@ -198,27 +198,27 @@ Table 1, and supplemental outputs excluding economic loss maps.
 
 The versions of each package used in NIH_impacts.Rmd and NIH_analysis.Rmd are:
 
-**tidyverse**: version `r packageVersion("tidyverse")`
+tidyverse: version 2.0.0
 
-readxl: version `r packageVersion("readxl")`
+readxl: version 1.4.5
 
-sf: version `r packageVersion("sf")`
+sf: version 1.0.21
 
-magrittr: version `r packageVersion("magrittr")`
+magrittr: version 2.0.3
 
-data.table: version `r packageVersion("data.table")`
+data.table: version 1.17.8
 
-cowplot version: `r packageVersion("cowplot")`
+cowplot version 1.2.0
 
-ggpp: version `r packageVersion("ggpp")`
+ggpp: version 0.6.0
 
-scales: version `r packageVersion("scales")`
+scales: version 1.4.0
 
-ggpubr: version `r packageVersion("ggpubr")`
+ggpubr: version 0.6.2
 
-kableExtra: version `r packageVersion("kableExtra")`
+kableExtra: version 1.4.0
 
-knitr: version `r packageVersion("knitr")`
+knitr: version version 1.50
 
-stringdist: version `r packageVersion("stringdist")`
+stringdist: version 0.9.17
 
