@@ -620,7 +620,7 @@ rac_df <- read.csv("data/RAC_countyAll.csv") %>%
           mutate(ORIGIN = str_pad(HomeCounty, 5, pad = "0")) %>%
           mutate(broad_sum_rac = sum.CNS03.+sum.CNS04.+sum.CNS05.+sum.CNS07.+
                              sum.CNS08.+sum.CNS12.+sum.CNS13.+sum.CNS14.+
-                             sum.CNS16. + sum.CNS20.,
+                             sum.CNS16.,
                  narrow_sum_rac = sum.CNS12.+sum.CNS13.+sum.CNS14.+sum.CNS16.) %>%
           mutate(broad_prop_rac = broad_sum_rac/AllCommutes,
                  narrow_prop_rac = narrow_sum_rac/AllCommutes) %>%
@@ -634,7 +634,7 @@ wac_df <- read.csv("data/WAC_tractAll.csv") %>%
           mutate(DESTINATION = str_pad(WorkTract, 11, pad = "0")) %>%
           mutate(broad_sum_wac = sum.CNS03.+sum.CNS04.+sum.CNS05.+sum.CNS07.+
                              sum.CNS08.+sum.CNS12.+sum.CNS13.+sum.CNS14.+
-                             sum.CNS16. + sum.CNS20.,
+                             sum.CNS16.,
                  narrow_sum_wac = sum.CNS12.+sum.CNS13.+sum.CNS14.+sum.CNS16.) %>%
           mutate(broad_prop_wac = broad_sum_wac/AllCommutes,
                  narrow_prop_wac = narrow_sum_wac/AllCommutes) %>%
