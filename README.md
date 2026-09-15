@@ -58,7 +58,6 @@ to NIH_analysis.Rmd.
 │   ├── figs2.pdf
 │   ├── gdp-v-loss.png
 │   ├── jhu-sens.png
-│   ├── supp-comp-22.png
 │   ├── supp-comp_mr.png
 │   ├── supp-comp_natl.png
 │   ├── supp-comp_sect.png
