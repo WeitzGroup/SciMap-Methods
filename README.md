@@ -18,12 +18,12 @@ results reported in the manuscript).
 Input data used in the analysis are in the data folder, outputs csvs are
 in the output folder, and output figures are in the figs folder. More
 detailed descriptions follow. Code developed for R version 4.5.1. Each
-script should take 1-5 minutes to run. NIH_impacts.Rmd should be run prior
-to NIH_analysis.Rmd.
+script should take 1-5 minutes to run. NIH_impacts.Rmd should be run
+prior to NIH_analysis.Rmd.
 
 ## Project Structure
 
-```
+```         
 ├── data/                                   # Raw data
 │   ├── 2023-ACP-Typology.csv
 │   ├── CD_pop2024.csv
@@ -130,8 +130,10 @@ to NIH_analysis.Rmd.
     generated at state level (from URM)
 -   us_representatives_119th_congress - representative name and party
     affiliation by district
--   JHU/UCLA_wTract - tract assignment for each satellite location for JHU and UCLA
--   Tract_work_County_home_JHU/UCLApts - tract-to-county flows for each tract containing a satellite JHU or UCLA location
+-   JHU/UCLA_wTract - tract assignment for each satellite location for
+    JHU and UCLA
+-   Tract_work_County_home_JHU/UCLApts - tract-to-county flows for each
+    tract containing a satellite JHU or UCLA location
 
 ## Output
 
@@ -201,7 +203,9 @@ static versus commuter estimates for counties and districts
 (static_vs_commuter, static_vs_commuter-CD); and sensitivity analyses of
 county-level estimates using state-specific economic multipliers or
 varying commuter influence $\rho$ (NIH_impact_county-diffmult,
-NIH_impact_county-sens), raw losses estimated without applying a multiplier (raw_loss), and economic losses estimate using the most recent commuter flows (recent_flows).
+NIH_impact_county-sens), raw losses estimated without applying a
+multiplier (raw_loss), and economic losses estimate using the most
+recent commuter flows (recent_flows).
 
 ## Figs
 
@@ -214,7 +218,8 @@ Table 1, and supplemental outputs excluding economic loss maps.
 
 ## Package versions
 
-The versions of each package used in NIH_impacts.Rmd and NIH_analysis.Rmd are:
+The versions of each package used in NIH_impacts.Rmd and
+NIH_analysis.Rmd are:
 
 tidyverse: version 2.0.0
 
@@ -239,4 +244,3 @@ kableExtra: version 1.4.0
 knitr: version version 1.50
 
 stringdist: version 0.9.17
-

@@ -50,7 +50,7 @@ if(file.exists("output/county_commute_NIH.csv")){
 }
 
 # Calculate proportion of economic loss in commuter counties nearby
-county_commute <- county_commute %>%
+county_commute %>%
   mutate(DESTINATION = str_pad(DESTINATION, 5, pad = "0")) %>%
   mutate(ORIGIN = str_pad(ORIGIN, 5, pad = "0")) %>%
   filter(substr(DESTINATION, 1, 5) %in% c("13089", "48201", "42003")) %>%
@@ -58,6 +58,9 @@ county_commute <- county_commute %>%
   mutate(DESTINATION = substr(DESTINATION, 0, 5)) %>%
   filter(IDC_econ_loss != 0) %>%
   select(ORIGIN, IDC_econ_loss, DESTINATION) %>%
+  group_by(ORIGIN, DESTINATION) %>%
+  summarize(IDC_econ_loss = sum(IDC_econ_loss, na.rm=TRUE)) %>%
+  select(ORIGIN, DESTINATION, IDC_econ_loss) %>%
   write.csv("figs/fig1-vals.csv", row.names=FALSE)
 
 ```
